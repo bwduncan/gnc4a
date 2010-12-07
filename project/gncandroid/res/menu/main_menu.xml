@@ -4,13 +4,13 @@
 	<item
 		android:id="@+id/menu_save"
 		android:title="@string/menu_save"
-		android:icon="@drawable/ic_menu_save" />
+		android:icon="@android:drawable/ic_menu_save" />
 	<item
 		android:title="@string/menu_discard"
 		android:id="@+id/menu_discard"
-		android:icon="@drawable/ic_menu_discard" />
+		android:icon="@android:drawable/ic_menu_close_clear_cancel" />
 	<item
 		android:title="@string/menu_prefs"
 		android:id="@+id/menu_prefs"
-		android:icon="@drawable/ic_menu_pref" />
-</menu>
+		android:icon="@android:drawable/ic_menu_preferences" />
+</menu> 

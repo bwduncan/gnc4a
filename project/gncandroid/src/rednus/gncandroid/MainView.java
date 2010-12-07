@@ -1,11 +1,8 @@
 /**
- * Copyright (C) 2010 Rednus Limited
- *     http://www.rednus.co.uk
- *  
- * Project     : GNCAndroid
- * Package     : rednus.GNCAndroid
- * File        : MainView.java
- * Description : 
+ * Copyright (C) 2010 Rednus Limited http://www.rednus.co.uk
+ * 
+ * Project : GNCAndroid Package : rednus.GNCAndroid File : MainView.java
+ * Description :
  */
 package rednus.gncandroid;
 import android.app.AlertDialog;
@@ -20,18 +17,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.Toast;
+
 /**
  * @author shyam.avvari
  * 
  */
-public class MainView 
-		extends TabActivity {
+public class MainView extends TabActivity {
 	// TAG for this activity
 	private static final String	TAG	= "MainView";
 	// Aplication Reference
-	private GNCAndroid			app;
+	private GNCAndroid					app;
 	// progress bar
-	private ProgressDialog		pd;
+	private ProgressDialog			pd;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,7 +40,8 @@ public class MainView
 			if (app.localLOGV)
 				Log.i(TAG, "No Data file set.. Forcing preferences...");
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(app.res.getString(R.string.message_set_data_file))
+			builder
+					.setMessage(app.res.getString(R.string.message_set_data_file))
 					.setCancelable(false)
 					.setPositiveButton(app.res.getString(R.string.button_text_ok),
 							new DialogInterface.OnClickListener() {
@@ -108,20 +106,23 @@ public class MainView
 	@Override
 	protected void onRestart() {
 		super.onRestart();
+		// #TODO - Need a way to reload the data when back from preferences the
+		// method below force closing the app
 		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Activity Restarted");
 		// replay created event so checks for file and shows screen
 		this.onCreate(new Bundle());
 	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onBackPressed()
 	 */
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		//we dont want the app to be running so close it
+		// we dont want the app to be running so close it
 		this.finish();
 	}
 	/*
@@ -144,19 +145,19 @@ public class MainView
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.menu_prefs:
-			// show prefs
-			Intent i = new Intent(getBaseContext(), Preferences.class);
-			startActivity(i);
-			return true;
-		case R.id.menu_save:
-			// Save data
-			return true;
-		case R.id.menu_discard:
-			// cancel changes and reload - but ask before doing
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.menu_prefs:
+				// show prefs
+				Intent i = new Intent(getBaseContext(), Preferences.class);
+				startActivity(i);
+				return true;
+			case R.id.menu_save:
+				// Save data
+				return true;
+			case R.id.menu_discard:
+				// cancel changes and reload - but ask before doing
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 }
