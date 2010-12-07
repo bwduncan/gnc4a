@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="pref_data_file_key">PREF_DATA_FILE</string>
+<string name="def_folder">/sdcard</string>
+<string name="pref_data_file_gzip">PREF_DATA_FILE_GZIP</string>
+<string name="app_version">0.1</string>
+<string name="pref_about_key">PREF_ABOUT</string>
+<string name="pref_version_key">PREF_VERSION</string>
+</resources>

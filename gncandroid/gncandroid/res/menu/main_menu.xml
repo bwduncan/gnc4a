@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id="@+id/menu_save"
+		android:title="@string/menu_save"
+		android:icon="@drawable/ic_menu_save" />
+	<item
+		android:title="@string/menu_discard"
+		android:id="@+id/menu_discard"
+		android:icon="@drawable/ic_menu_discard" />
+	<item
+		android:title="@string/menu_prefs"
+		android:id="@+id/menu_prefs"
+		android:icon="@drawable/ic_menu_pref" />
+</menu>

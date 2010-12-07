@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory
+		android:title="@string/menu_file_pref">
+		<Preference
+			android:key="@string/pref_data_file_key"
+			android:title="@string/pref_data_file_location"
+			android:summary="@string/no_data_file">
+			<intent
+				android:action="rednus.GNCAndroid.action.FILECHOOSER" />
+		</Preference>
+		<CheckBoxPreference
+			android:key="@string/pref_data_file_gzip"
+			android:title="@string/data_file_compressed" />
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="@string/menu_app_pref">
+		<Preference
+			android:key="@string/pref_version_key"
+			android:title="@string/pref_app_version"
+			android:summary="@string/app_version">
+		</Preference>
+		<Preference
+			android:key="@string/pref_about_key"
+			android:title="@string/pref_app_about">
+		</Preference>
+		<Preference
+			android:title="@string/pref_app_help">
+			<intent
+				android:action="android.intent.action.VIEW"
+				android:data="http://www.android.com" />
+		</Preference>
+	</PreferenceCategory>
+</PreferenceScreen>

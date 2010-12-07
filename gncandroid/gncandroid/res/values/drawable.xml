@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	
+<drawable name="list_expanded">@*android:drawable/expander_ic_maximized</drawable>
+<drawable name="list_collapsed">@*android:drawable/expander_ic_minimized</drawable>
+</resources>

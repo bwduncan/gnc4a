@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:minHeight="?android:attr/listPreferredItemHeight"
+	android:stretchColumns="1"
+	android:paddingRight="6dip"
+	android:paddingLeft="6dip"
+	android:paddingTop="5dip"
+	android:paddingBottom="5dip"
+	android:gravity="center_vertical">
+	<TableRow>
+		<ImageView
+			android:id="@+id/acc_more"
+			android:layout_width="32dip"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:gravity="center_vertical" />
+		<TextView
+			android:id="@+id/acc_name"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:singleLine="true"
+			android:ellipsize="marquee"
+			android:layout_marginBottom="2dip"
+			android:layout_gravity="center_vertical"
+			android:gravity="left" />
+		<TextView
+			android:id="@+id/acc_balance"
+			android:gravity="right"
+			android:layout_gravity="center_vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium" />
+	</TableRow>
+</TableLayout>
