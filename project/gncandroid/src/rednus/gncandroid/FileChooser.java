@@ -1,11 +1,8 @@
 /**
- * Copyright (C) 2010 Rednus Limited
- *     http://www.rednus.co.uk
- *  
- * Project     : GNCAndroid
- * Package     : rednus.GNCAndroid
- * File        : Preferences.java
- * Description : 
+ * Copyright (C) 2010 Rednus Limited http://www.rednus.co.uk
+ * 
+ * Project : GNCAndroid Package : rednus.GNCAndroid File : Preferences.java
+ * Description :
  */
 package rednus.gncandroid;
 import java.io.File;
@@ -21,25 +18,24 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 /**
  * @author shyam
  * 
  */
-public class FileChooser
-		extends ListActivity {
-	private final String		TAG				= "File Chooser";
+public class FileChooser extends ListActivity {
+	private final String				TAG						= "File Chooser";
 	protected ArrayList<String>	mFileList;
-	protected File				mRoot;
-	// private static final String VALID_FILENAME = "*";
+	protected File							mRoot;
 	public static final String	FILEPATH_KEY	= "formpath";
-	private String				pref_name;
-	private GNCAndroid			app;
+	private String							pref_name;
+	private GNCAndroid					app;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (GNCAndroid) getApplication();
-		//app.res.getString(R.string.pref_data_file_key);
+		// app.res.getString(R.string.pref_data_file_key);
 		if (app.localLOGV)
 			Log.i(TAG, "Filechooser started");
 		// make this a dialogue
@@ -74,8 +70,7 @@ public class FileChooser
 			tv.setText(getString(R.string.sdcard_error));
 			return false;
 		}
-		// if storage directory does not exist, create it.
-		boolean made = true;
+		// now get file object for the path
 		mRoot = new File(path);
 		if (!mRoot.exists())
 			tv.setText(getString(R.string.directory_error, path));
@@ -104,7 +99,8 @@ public class FileChooser
 	private void displayFiles() {
 		ArrayAdapter<String> fileAdapter;
 		Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
-		fileAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mFileList);
+		fileAdapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, mFileList);
 		setListAdapter(fileAdapter);
 	}
 	/**
@@ -121,7 +117,8 @@ public class FileChooser
 			Log.i(TAG, "File selected, returning result");
 		// send result
 		Intent i = new Intent();
-		i.putExtra(app.res.getString(R.string.pref_data_file_key), f.getAbsolutePath());
+		i.putExtra(app.res.getString(R.string.pref_data_file_key),
+				f.getAbsolutePath());
 		setResult(RESULT_OK, i);
 		// close activity
 		finish();

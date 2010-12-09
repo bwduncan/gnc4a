@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
-import android.widget.Toast;
 
 /**
  * @author shyam.avvari
@@ -53,18 +52,13 @@ public class MainView extends TabActivity {
 								}
 							});
 			builder.create().show();
-			return;
 		}
 		// add log entry
 		if (app.localLOGV)
-			Log.i(TAG, "Activity Started");
-		// Read data
-		pd = ProgressDialog.show(this, "Please Wait...", "Loading...", true);
+			Log.i(TAG, "Showing main screen...");
 		// app.dataHandler.readGNCData();
 		// The activity TabHost
 		final TabHost tabHost = getTabHost();
-		// remove all tabs
-		tabHost.clearAllTabs();
 		// Reusable TabSpec for each tab
 		TabHost.TabSpec spec;
 		// Reusable Intent for each tab
@@ -95,7 +89,15 @@ public class MainView extends TabActivity {
 		tabHost.setCurrentTab(0);
 		// add log entry
 		if (app.localLOGV)
-			Log.i(TAG, "Activity Finished");
+			Log.i(TAG, "Showing main screen...Done");
+		// Read data if has
+		readData();		
+	}
+	private void readData(){
+		pd = ProgressDialog.show(this, "Please Wait...", "Loading...", true);
+		if(app.readData()){
+			//#TODO trigger account view to refresh
+		}
 		pd.dismiss();
 	}
 	/*
@@ -106,13 +108,12 @@ public class MainView extends TabActivity {
 	@Override
 	protected void onRestart() {
 		super.onRestart();
-		// #TODO - Need a way to reload the data when back from preferences the
-		// method below force closing the app
 		// add log entry
 		if (app.localLOGV)
-			Log.i(TAG, "Activity Restarted");
-		// replay created event so checks for file and shows screen
-		this.onCreate(new Bundle());
+			Log.i(TAG, "Activity Restarted.. Checking if data file changed...");
+		//check if reload flag is set then read data again
+		if(app.isReloadFile())
+			readData();
 	}
 	/*
 	 * (non-Javadoc)

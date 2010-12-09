@@ -36,7 +36,7 @@ public class Preferences
 		//set activity title
 		setTitle(getString(R.string.app_name) + " > " + app.res.getString(R.string.menu_prefs));
 		// set preferences file name
-		this.getPreferenceManager().setSharedPreferencesName(app.SPN);
+		this.getPreferenceManager().setSharedPreferencesName(GNCAndroid.SPN);
 		// Load the preferences from an XML resource
 		addPreferencesFromResource(R.xml.preferences);
 		// get custom field to capture on click
@@ -96,6 +96,8 @@ public class Preferences
 		// check if not already set then pass value
 		if (app.getDataFile() != null)
 			dataFilePref.setSummary(app.getDataFile());
+		if (app.localLOGV)
+			Log.i(TAG, "Showing Preferences screen..Done");
 	}
 	/*
 	 * Gets return from FileCHooser activity for selected file name
@@ -113,8 +115,6 @@ public class Preferences
 			this.findPreference(pref_data_file_key).setSummary(path);
 			//set preference value
 			this.findPreference(pref_data_file_key).getEditor().putString(pref_data_file_key, path).commit();
-			// now copy path to application
-			app.setDataFile(path);
 		} else
 			super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -126,7 +126,7 @@ public class Preferences
 		super.onBackPressed();
 		//here finish the activity to free memory
 		if (app.localLOGV)
-			Log.i(TAG, "Activity Exited");
+			Log.i(TAG, "Activity Finished");
 		this.finish();
 	}
 }
