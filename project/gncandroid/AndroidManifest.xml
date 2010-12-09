@@ -1,48 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	package="rednus.gncandroid"
-	android:versionCode="1"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="rednus.gncandroid" android:versionCode="1"
 	android:installLocation="preferExternal" android:versionName="@string/app_version">
-	<application
-		android:icon="@drawable/icon"
-		android:description="@string/app_descr"
-		android:label="@string/app_name"
-		android:theme="@android:style/Theme"
-		android:allowClearUserData="true" android:name="GNCAndroid">
-		<activity
-			android:icon="@drawable/icon"
-			android:description="@string/app_descr"
-			android:name="MainView"
-			android:label="@string/app_descr">
+	<application android:icon="@drawable/icon"
+		android:description="@string/app_descr" android:label="@string/app_name"
+		android:theme="@android:style/Theme" android:allowClearUserData="true" android:name="@string/application">
+		<activity android:icon="@drawable/icon" android:description="@string/app_descr"
+			android:name="MainView" android:label="@string/app_descr">
 			<intent-filter>
-				<action
-					android:name="android.intent.action.MAIN" />
-				<category
-					android:name="android.intent.category.LAUNCHER" />
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity
-			android:name=".Preferences"></activity>
-		<activity
-			android:name=".FileChooser"
-			android:theme="@android:style/Theme.Dialog"
+		<activity android:name=".Preferences"></activity>
+		<activity android:name=".FileChooser" android:theme="@android:style/Theme.Dialog"
 			android:label="@string/file_choose_title">
 			<intent-filter>
-				<action
-					android:name="rednus.GNCAndroid.action.FILECHOOSER"></action>
-				<category
-					android:name="android.intent.category.DEFAULT"></category>
+				<action android:name="rednus.GNCAndroid.action.FILECHOOSER"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
 			</intent-filter>
 		</activity>
-		<activity
-			android:name=".AccountsActivity"></activity>
-		<activity
-			android:name=".QuickEntryActivity"></activity>
+		<activity android:name=".AccountsActivity"></activity>
+		<activity android:name=".QuickEntryActivity"></activity>
 	</application>
-	<uses-sdk
-		android:minSdkVersion="8" />
-	<permission
-		android:label="Access SD Card"
+	<uses-sdk android:minSdkVersion="8" />
+	<permission android:label="Access SD Card"
 		android:name="android.permission.WRITE_EXTERNAL_STORAGE"></permission>
 </manifest>
