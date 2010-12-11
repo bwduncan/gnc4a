@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -94,11 +95,7 @@ public class MainView extends TabActivity {
 		readData();		
 	}
 	private void readData(){
-		pd = ProgressDialog.show(this, "Please Wait...", "Loading...", true);
-		if(app.readData()){
-			//#TODO trigger account view to refresh
-		}
-		pd.dismiss();
+		new ReadDataTask().execute();
 	}
 	/*
 	 * (non-Javadoc)
@@ -113,7 +110,7 @@ public class MainView extends TabActivity {
 			Log.i(TAG, "Activity Restarted.. Checking if data file changed...");
 		//check if reload flag is set then read data again
 		if(app.isReloadFile())
-			readData();
+			new ReadDataTask().execute();
 	}
 	/*
 	 * (non-Javadoc)
@@ -161,4 +158,23 @@ public class MainView extends TabActivity {
 				return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	private class ReadDataTask extends AsyncTask<Void, Void, Boolean> {
+		
+		protected void onPreExecute() {
+			if ( pd == null )
+				pd = ProgressDialog.show(MainView.this, "Please Wait...", "Loading...", true);
+			else
+				pd.show();
+		}
+		
+	     protected Boolean doInBackground(Void...voids ) {
+	    	 return app.readData();
+	     }
+
+	     protected void onPostExecute(Boolean result) {
+	    	 // Refresh Veiw here
+	         pd.dismiss();
+	     }
+	 }
 }
