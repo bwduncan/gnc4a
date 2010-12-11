@@ -30,6 +30,14 @@
 <string name="menu_app_pref">Application Details</string>
 <string name="pref_app_version">Version</string>
 
+<string name="label_date">Date:</string>
+<string name="label_description">Description:</string>
+<string name="label_to">To:</string>
+<string name="label_from">From:</string>
+<string name="label_amount">Amount:</string>
+<string name="button_save">Save</string>
+<string name="button_clear">Clear</string>
+
 <string name="app_version_history">Version 0.1 - Testing. </string>
 <string name="alert_dialog_ok">Ok</string>
 <string name="app_about_text">About GnuCash Companion for Android.</string>

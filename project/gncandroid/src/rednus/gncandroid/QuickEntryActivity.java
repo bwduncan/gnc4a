@@ -8,10 +8,23 @@
  * Description : 
  */
 package rednus.gncandroid;
+import java.util.Calendar;
+
+import rednus.gncandroid.R;
+
+//import rednus.gncandroid.R;
+
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 /**
  * @author shyam.avvari
  * 
@@ -22,6 +35,19 @@ public class QuickEntryActivity
 	private static final String	TAG	= "QuickEntryActivity";
 	// Log information boolean
 	private GNCAndroid			app;
+	
+	static final int DATE_DIALOG_ID = 0;
+	
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+    
+	private AutoCompleteTextView mDescription;
+	private AutoCompleteTextView mTo;
+	private AutoCompleteTextView mFrom;
+	private EditText mAmount;
+	private Button dateButton;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -35,12 +61,93 @@ public class QuickEntryActivity
 		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Activity created");
-		// Temp
-		TextView t = new TextView(this);
-		t.setText("QuickEntry");
-		setContentView(t);
+		setContentView(R.layout.quickentry);
+		
+		dateButton = (Button) findViewById(R.id.ButtonDate);
+		Button saveButton = (Button) findViewById(R.id.ButtonSave);
+		Button clearButton = (Button) findViewById(R.id.ButtonClear);
+		
+		mDescription = (AutoCompleteTextView) findViewById(R.id.EditTextDescriptoin);
+		mTo = (AutoCompleteTextView) findViewById(R.id.to);
+		mFrom = (AutoCompleteTextView) findViewById(R.id.from);
+		mAmount = (EditText) findViewById(R.id.amount);
+	
+		/*  TODO: Tied the auto completes to data from the xml file
+		ArrayAdapter<String> accountAdapter = new ArrayAdapter<String>(this, R.layout.list_item, mDbHelper.getAllAccounts());
+		mTo.setAdapter(accountAdapter);
+		mFrom.setAdapter(accountAdapter);
+		
+		mTransactions = mDbHelper.getAllTransctions();
+		ArrayAdapter<String> transactionAdapter = new ArrayAdapter<String>(this, R.layout.list_item, mTransactions);
+		mDescription.setAdapter(transactionAdapter);
+		*/
+		
+        // get the current date
+        final Calendar c = Calendar.getInstance();
+		dateButton.setText(DateFormat.format("MM/dd/yyyy", c));
+		
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+		dateButton.setOnClickListener(new View.OnClickListener() {
+		      public void onClick(View v) {
+		    	  showDialog(DATE_DIALOG_ID);
+		      }
+		    });
+		
+		saveButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// TODO Save goes here
+			}
+		});
+		
+		clearButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+		        final Calendar c = Calendar.getInstance();
+				dateButton.setText(DateFormat.format("MM/dd/yyyy", c));
+				
+				mDescription.setText("");
+				mTo.setText("");
+				mFrom.setText("");
+				mAmount.setText("0.00");
+			}
+		});
+     
 		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Activity Finished");
 	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+	    switch (id) {
+	    case DATE_DIALOG_ID:
+	        return new DatePickerDialog(this,
+	                    mDateSetListener,
+	                    mYear, mMonth, mDay);
+	    }
+	    return null;
+	}
+	
+    // the callback received when the user "sets" the date in the dialog
+    private DatePickerDialog.OnDateSetListener mDateSetListener =
+            new DatePickerDialog.OnDateSetListener() {
+
+                public void onDateSet(DatePicker view, int year, 
+                                      int monthOfYear, int dayOfMonth) {
+                    mYear = year;
+                    mMonth = monthOfYear;
+                    mDay = dayOfMonth;
+            		
+            		Button dateButton = (Button) findViewById(R.id.ButtonDate);
+
+            		dateButton.setText(new StringBuilder()
+	                    // Month is 0 based so add 1
+	                    .append(mMonth + 1).append("/")
+	                    .append(mDay).append("/")
+	                    .append(mYear));
+	                }
+            };	
+    
 }
