@@ -21,10 +21,15 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 /**
  * @author shyam.avvari
  * 
@@ -47,6 +52,7 @@ public class QuickEntryActivity
 	private AutoCompleteTextView mFrom;
 	private EditText mAmount;
 	private Button dateButton;
+	private Spinner transtypeSpinner;
 
 	/*
 	 * (non-Javadoc)
@@ -71,6 +77,14 @@ public class QuickEntryActivity
 		mTo = (AutoCompleteTextView) findViewById(R.id.to);
 		mFrom = (AutoCompleteTextView) findViewById(R.id.from);
 		mAmount = (EditText) findViewById(R.id.amount);
+		
+		transtypeSpinner = (Spinner) findViewById(R.id.transtype_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.transtype_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        transtypeSpinner.setAdapter(adapter);
+        
+        transtypeSpinner.setOnItemSelectedListener(new TransTypeOnItemSelectedListener());        
 	
 		/*  TODO: Tied the auto completes to data from the xml file
 		ArrayAdapter<String> accountAdapter = new ArrayAdapter<String>(this, R.layout.list_item, mDbHelper.getAllAccounts());
@@ -130,7 +144,7 @@ public class QuickEntryActivity
 	    return null;
 	}
 	
-    // the callback received when the user "sets" the date in the dialog
+    // the call back received when the user "sets" the date in the dialog
     private DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
 
@@ -149,5 +163,18 @@ public class QuickEntryActivity
 	                    .append(mYear));
 	                }
             };	
-    
+            
+    public class TransTypeOnItemSelectedListener implements OnItemSelectedListener {
+
+        public void onItemSelected(AdapterView<?> parent,
+            View view, int pos, long id) {
+          Toast.makeText(parent.getContext(), 
+              parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
+        }
+
+        public void onNothingSelected(AdapterView parent) {
+          // Do nothing.
+        }
+    }
+   
 }

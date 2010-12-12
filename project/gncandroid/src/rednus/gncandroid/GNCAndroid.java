@@ -5,10 +5,13 @@
  * Description :
  */
 package rednus.gncandroid;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.util.Log;
 
 /**

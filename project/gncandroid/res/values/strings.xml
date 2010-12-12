@@ -41,4 +41,10 @@
 <string name="app_version_history">Version 0.1 - Testing. </string>
 <string name="alert_dialog_ok">Ok</string>
 <string name="app_about_text">About GnuCash Companion for Android.</string>
+<string name="label_transtype">Transaction Type:</string>
+<string-array name="transtype_array">
+    <item>Transfer</item>
+    <item>Invoice</item>
+    <item>Expense Voucher</item>
+</string-array>
 </resources>
