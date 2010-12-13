@@ -6,8 +6,11 @@
  */
 package rednus.gncandroid;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import android.R.drawable;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,12 +23,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 /**
- * @author shyam
+ * @author shyam, davide
  * 
  */
 public class FileChooser extends ListActivity {
 	private final String				TAG						= "File Chooser";
 	protected ArrayList<String>	mFileList;
+	//protected ArrayList<drawable>	mIconList;
 	protected File							mRoot;
 	public static final String	FILEPATH_KEY	= "formpath";
 	private String							pref_name;
@@ -44,19 +48,28 @@ public class FileChooser extends ListActivity {
 		getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,
 				android.R.drawable.stat_notify_sdcard);
 		// set data
-		this.initialize(app.res.getString(R.string.def_folder));
+		//if // It would be nice to start from the directory of the previously selected data file (if not null)
+			this.initialize(app.res.getString(R.string.def_folder));
+		//else {
+		//	this.initialize(new File(app.res.getString(R.string.pref_data_file_key)).getParentFile().getAbsolutePath());
+		//}
 	}
 	private void initialize(String path) {
 		mFileList = new ArrayList<String>();
+		//mFileList.add("..");
 		if (getDirectory(path)) {
 			getFiles(mRoot);
+			Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
 			displayFiles();
 		}
 	}
 	private void refreshRoot(File f) {
 		mRoot = f;
 		mFileList.clear();
+		if(!f.getName().equalsIgnoreCase("sdcard"))
+			mFileList.add("..");
 		getFiles(mRoot);
+		Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
 		((ArrayAdapter) this.getListAdapter()).notifyDataSetChanged();
 	}
 	private boolean getDirectory(String path) {
@@ -98,7 +111,6 @@ public class FileChooser extends ListActivity {
 	 */
 	private void displayFiles() {
 		ArrayAdapter<String> fileAdapter;
-		Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
 		fileAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, mFileList);
 		setListAdapter(fileAdapter);
@@ -108,9 +120,19 @@ public class FileChooser extends ListActivity {
 	 */
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		File f = new File(mRoot + "/" + mFileList.get(position));
+		File f;
+		if (mFileList.get(position) == "..")
+			f = new File(mRoot.getParent());
+		else
+			f = new File(mRoot + "/" + mFileList.get(position));
 		if (f.isDirectory()) {
 			this.refreshRoot(f);
+			/*try {
+				this.refreshRoot(f.getCanonicalFile());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 			return;
 		}
 		if (app.localLOGV)
