@@ -8,6 +8,7 @@ package rednus.gncandroid;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,34 +17,58 @@ import java.util.zip.GZIPInputStream;
 import android.util.Log;
 
 /**
- * This class defines what method should a data handler implement. It makes life
- * easy in future if SQLITE data handler is planned.
+ * This class implements methods to read data file and create a data collection
+ * and also methods to update the data file.
  * 
  * @author shyam.avvari
  * 
  */
 public class GNCDataHandler {
-	// TAG for this activity
-	private static final String	TAG	= "GNCDataHandler";
-	// Application
-	private GNCAndroid					app;
-	// Data Collection
-	private DataCollection			gncData;
+	private static final String	TAG	= "GNCDataHandler"; // TAG for this activity
+	private GNCAndroid					app;										// Application
+	private DataCollection			gncData;								// Data Collection
 	/**
-	 * Initialize Data handler
+	 * On create the handler create new DataCollection, create input stream for
+	 * file and depending on the parser used the data will be parsed.
+	 * 
+	 * @param app
+	 *          GNCAndroid Application reference
+	 * @param dataFile
+	 *          String containing path to data file
+	 * @param compressed
+	 *          Boolean to specify if the data file is compressed or not
+	 * @param parserType
+	 *          Type of parser to be used
 	 */
-	public GNCDataHandler(GNCAndroid app, String dataFile, boolean compressed) {
+	public GNCDataHandler(GNCAndroid app, String dataFile, boolean compressed,
+			String parserType) {
 		this.app = app;
+		// create new collection
 		gncData = new DataCollection();
-		readDataFile(dataFile, compressed);
+		// get file reader
+		InputStream inStream = getInputStream(dataFile, compressed);
+		// depending on parser type
+		if (parserType.equals("DOM"))
+			readFileUsingDOM(inStream);
+		if (parserType.equals("SAX"))
+			readFileUsingSAX(inStream);
 	}
+	/**
+	 * Returns the data collection object.
+	 */
 	public DataCollection getGncData() {
 		return gncData;
 	}
-	private void readDataFile(String filePath, boolean compressed) {
-		FileInputStream inStream;
-		GZIPInputStream gzStream;
-		DomDataParser parser;
+	/**
+	 * This method returns the InputStream. If the compressed flag is set then the
+	 * return is of GZipInputStream type, otherwise FileInputStream.
+	 * 
+	 * @param filePath
+	 * @param compressed
+	 * @return
+	 */
+	private InputStream getInputStream(String filePath, boolean compressed) {
+		InputStream inStream;
 		// Get the input stream
 		try {
 			inStream = new FileInputStream(filePath);
@@ -54,18 +79,42 @@ public class GNCDataHandler {
 		// check if it is compressed then get gzip stream
 		if (compressed)
 			try {
-				gzStream = new GZIPInputStream(inStream);
-				parser = new DomDataParser(gzStream, gncData);
+				inStream = new GZIPInputStream(inStream);
 			} catch (IOException e) {
-				Log.i(TAG, "File " + filePath + " cannot be read...");
+				Log.i(TAG, "Gzip File " + filePath + " cannot be read...");
 				throw new RuntimeException(e);
 			}
-		else
-			parser = new DomDataParser(inStream, gncData);
-		//parse data
+		return inStream;
+	}
+	/**
+	 * This method creates DomDataParser and parses the data (Slow processing but
+	 * full functionality)
+	 * 
+	 * @param inStream
+	 */
+	private void readFileUsingDOM(InputStream inStream) {
+		// create parser
+		DomDataParser parser = new DomDataParser(inStream, gncData);
+		// parse data
 		parser.parse();
 	}
+	/**
+	 * This method creates SAXDataParser and parses the data (Fast processing but
+	 * less functionality)
+	 * 
+	 * @param inStream
+	 */
+	private void readFileUsingSAX(InputStream inStream) {
+		// create parser class
+		// parse data
+	}
 	//
+	/**
+	 * This class is a collection of all gnc data objects.
+	 * 
+	 * @author shyam.avvari
+	 * 
+	 */
 	public class DataCollection {
 		// book information
 		public Book									book			= new Book();

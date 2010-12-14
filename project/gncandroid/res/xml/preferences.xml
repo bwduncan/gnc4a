@@ -13,6 +13,13 @@
 		<CheckBoxPreference
 			android:key="@string/pref_data_file_gzip"
 			android:title="@string/data_file_compressed" />
+		<ListPreference
+			android:key="@string/pref_parser_type_key"
+			android:title="@string/parser_type"
+			android:summary="@string/summary_parser_type"
+			android:entries="@array/entries_parser_types"
+			android:entryValues="@array/entryvalues_parser_types"
+			android:dialogTitle="@string/dialog_title_parser_types" />
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/menu_app_pref">

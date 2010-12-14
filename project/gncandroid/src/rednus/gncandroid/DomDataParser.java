@@ -1,8 +1,7 @@
 /**
  * Copyright (C) 2010 Rednus Limited http://www.rednus.co.uk
  * 
- * Project : GNCAndroid Package : rednus.GNCAndroid File : MainView.java
- * Description :
+ * #TODO License
  */
 package rednus.gncandroid;
 import java.io.InputStream;
@@ -20,20 +19,26 @@ import android.util.Log;
  * @author shyam.avvari
  * 
  */
-public class DomDataParser {
-	// TAG for this activity
-	private static final String	TAG	= "DomDataParser";
-	DataCollection							gncData;
-	InputStream inStream;
-	private Document						dom; 
+public class DomDataParser extends AbstractParser {
+	private static final String	TAG	= "DomDataParser";	// TAG for this activity
+	private Document						dom;
 	private Element							root;
-	// create parser by sending input stream
+	/**
+	 * Capture stream and data references
+	 * 
+	 * @param inStream
+	 * @param data
+	 */
 	public DomDataParser(InputStream inStream, DataCollection data) {
-		// copy data object reference
-		gncData = data;
-		this.inStream = inStream;
+		// call super constructor
+		super(inStream, data);
 	}
-	public void parse(){
+	/**
+	 * Create DOM Parser and read data file. Once document is received - #TODO
+	 * 
+	 * @see rednus.gncandroid.AbstractParser#parse()
+	 */
+	public void parse() {
 		// start building document
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
@@ -44,8 +49,6 @@ public class DomDataParser {
 			Log.i(TAG, "Error Parsing data...");
 			throw new RuntimeException(e);
 		}
-		//write root name
-		
 		Log.i(TAG, "Got root - " + root.getNodeName());
 	}
 }

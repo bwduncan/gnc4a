@@ -1,8 +1,7 @@
 /**
  * Copyright (C) 2010 Rednus Limited http://www.rednus.co.uk
  * 
- * Project : GNCAndroid Package : rednus.GNCAndroid File : MainView.java
- * Description :
+ * #TODO License
  */
 package rednus.gncandroid;
 import android.app.AlertDialog;
@@ -23,20 +22,22 @@ import android.widget.TabHost;
  * 
  */
 public class MainView extends TabActivity {
-	// TAG for this activity
-	private static final String	TAG	= "MainView";
-	// Aplication Reference
-	private GNCAndroid					app;
-	// progress bar
-	private ProgressDialog			pd;
+	private static final String	TAG	= "MainView"; // TAG for this activity
+	private GNCAndroid					app;							// Application Reference
+	private ProgressDialog			pd;							// progress bar
+	/*
+	 * Start of activity. Check if data file can be read, if not show dialog and
+	 * navigate to preferences. Also add sub activities as tabs to self.
+	 * 
+	 * @see android.app.ActivityGroup#onCreate(android.os.Bundle)
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// get application
 		app = (GNCAndroid) getApplication();
 		// first check if data file is set otherwise show preferences
-		if (null == app.getDataFile()) {
-			// add log entry
+		if (!app.canReadData()) {
 			if (app.localLOGV)
 				Log.i(TAG, "No Data file set.. Forcing preferences...");
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -45,6 +46,7 @@ public class MainView extends TabActivity {
 					.setCancelable(false)
 					.setPositiveButton(app.res.getString(R.string.button_text_ok),
 							new DialogInterface.OnClickListener() {
+								@Override
 								public void onClick(DialogInterface dialog, int id) {
 									// show prefs
 									Intent i = new Intent(getBaseContext(), Preferences.class);
@@ -54,10 +56,8 @@ public class MainView extends TabActivity {
 							});
 			builder.create().show();
 		}
-		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Showing main screen...");
-		// app.dataHandler.readGNCData();
 		// The activity TabHost
 		final TabHost tabHost = getTabHost();
 		// Reusable TabSpec for each tab
@@ -78,6 +78,7 @@ public class MainView extends TabActivity {
 				.setIndicator(getString(R.string.ic_tab_quick),
 						app.res.getDrawable(R.drawable.ic_tab_actions)).setContent(intent);
 		tabHost.addTab(spec);
+		// #TODO add third tab
 		// // // add actions tab
 		// // intent = new Intent().setClass(this, ActionsActivity.class);
 		// // spec = tabHost
@@ -88,43 +89,14 @@ public class MainView extends TabActivity {
 		// // tabHost.addTab(spec);
 		// set default tab
 		tabHost.setCurrentTab(0);
-		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Showing main screen...Done");
 		// Read data if has
-		readData();		
-	}
-	private void readData(){
-		new ReadDataTask().execute();
-	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onRestart()
-	 */
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-		// add log entry
-		if (app.localLOGV)
-			Log.i(TAG, "Activity Restarted.. Checking if data file changed...");
-		//check if reload flag is set then read data again
-		if(app.isReloadFile())
+		if (app.canReadData())
 			new ReadDataTask().execute();
 	}
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onBackPressed()
-	 */
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		// we dont want the app to be running so close it
-		this.finish();
-	}
-	/*
-	 * (non-Javadoc)
+	 * When menu is selected on this app, show options.
 	 * 
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
 	 */
@@ -135,7 +107,7 @@ public class MainView extends TabActivity {
 		return true;
 	}
 	/*
-	 * (non-Javadoc)
+	 * When any menu item is selected, perform specific action
 	 * 
 	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
 	 */
@@ -144,37 +116,79 @@ public class MainView extends TabActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.menu_prefs:
-				// show prefs
+				// show preferences
 				Intent i = new Intent(getBaseContext(), Preferences.class);
 				startActivity(i);
 				return true;
 			case R.id.menu_save:
 				// Save data
+				// #TODO Save data
 				return true;
 			case R.id.menu_discard:
 				// cancel changes and reload - but ask before doing
+				// #TODO discard changes
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+	/*
+	 * When the view is restarted when returned from preferences screen, check if
+	 * the reload file flag is set and read data again if it does
+	 * 
+	 * @see android.app.Activity#onRestart()
+	 */
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		// add log entry
+		if (app.localLOGV)
+			Log.i(TAG, "Activity Restarted.. Checking if data file changed...");
+		// check if reload flag is set then read data again
+		if (app.isReloadFile() && app.canReadData())
+			// read data
+			new ReadDataTask().execute();
+		// #TODO trigger data set changed for AccountsActivity
+	}
+	/**
+	 * This class implements AsynTask and reads the data file in a new thread so
+	 * that the Time Out trigger does not happen.
+	 * 
+	 * @author John Gray
+	 * 
+	 */
 	private class ReadDataTask extends AsyncTask<Void, Void, Boolean> {
-		
+		/*
+		 * Call method readData of GNCAndroid in background task
+		 * 
+		 * @see android.os.AsyncTask#doInBackground(Params[])
+		 */
+		@Override
+		protected Boolean doInBackground(Void... voids) {
+			return app.readData();
+		}
+		/*
+		 * Close progress dialog after execution
+		 * 
+		 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+		 */
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// Refresh View here
+			pd.dismiss();
+		}
+		/*
+		 * Show progress dialog before execution
+		 * 
+		 * @see android.os.AsyncTask#onPreExecute()
+		 */
+		@Override
 		protected void onPreExecute() {
-			if ( pd == null )
-				pd = ProgressDialog.show(MainView.this, "Please Wait...", "Loading...", true);
+			if (pd == null)
+				pd = ProgressDialog.show(MainView.this, "Please Wait...", "Loading...",
+						true);
 			else
 				pd.show();
 		}
-		
-	     protected Boolean doInBackground(Void...voids ) {
-	    	 return app.readData();
-	     }
-
-	     protected void onPostExecute(Boolean result) {
-	    	 // Refresh Veiw here
-	         pd.dismiss();
-	     }
-	 }
+	}
 }

@@ -1,30 +1,25 @@
 /**
- * Copyright (C) 2010 Rednus Limited
- *     http://www.rednus.co.uk
- *  
- * Project     : GNCAndroid
- * Package     : rednus.GNCAndroid
- * File        : AccountsActivity.java
- * Description : 
+ * Copyright (C) 2010 Rednus Limited http://www.rednus.co.uk
+ * 
+ * #TODO License
  */
 package rednus.gncandroid;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log; 
+import android.util.Log;
 import android.widget.TextView;
+
 /**
  * @author shyam.avvari
  * 
  */
-public class AccountsActivity
-		extends Activity {
+public class AccountsActivity extends Activity {
 	// implements OnItemClickListener {
-	// TAG for this activity
-	private static final String	TAG	= "AccountsActivity";
-	// Aplication Reference
-	private GNCAndroid			app;
+	private static final String	TAG	= "AccountsActivity"; // TAG for this activity
+	private GNCAndroid					app;											// Application Reference
 	/*
-	 * (non-Javadoc)
+	 * When activity is started, and if Data file is already read, then display
+	 * account information tree.
 	 * 
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */
@@ -33,14 +28,14 @@ public class AccountsActivity
 		super.onCreate(savedInstanceState);
 		// get application
 		app = (GNCAndroid) getApplication();
-		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Activity created");
-		// Temp
+		// #TODO display account tree
+		// temp
 		TextView t = new TextView(this);
-		t.setText("QuickEntry");
+		t.setText("Accounts");
 		setContentView(t);
-		// add log entry
+		// done
 		if (app.localLOGV)
 			Log.i(TAG, "Activity Finished");
 	}

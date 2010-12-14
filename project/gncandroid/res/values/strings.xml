@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="application">GNCAndroid</string>
+	<string
+		name="application">GNCAndroid</string>
 	<string
 		name="app_descr">GnuCash for Android</string>
 	<string
@@ -11,40 +12,68 @@
 		name="ic_tab_accounts">Account Summary</string>
 	<string
 		name="ic_tab_actions">Actions</string>
-<string name="menu_prefs">Preferences</string>
-<string name="pref_app_about">About</string>
-<string name="pref_app_help">Help</string>
-<string name="pref_data_file_location">Data File Location</string>
-
-<string name="no_files_error">No Files here...</string>
-<string name="sdcard_error">SD Card Not Found</string>
-<string name="directory_error">Cannot access directory.</string>
-<string name="file_choose_title">Choose Data File</string>
-<string name="no_data_file">No Data File.</string>
-<string name="message_set_data_file">Set data file location.</string>
-<string name="button_text_ok">Ok</string>
-<string name="data_file_compressed">Data file Compressed?</string>
-<string name="menu_file_pref">Data File Details</string>
-<string name="menu_save">Save</string>
-<string name="menu_discard">Discard</string>
-<string name="menu_app_pref">Application Details</string>
-<string name="pref_app_version">Version</string>
-
-<string name="label_date">Date:</string>
-<string name="label_description">Description:</string>
-<string name="label_to">To:</string>
-<string name="label_from">From:</string>
-<string name="label_amount">Amount:</string>
-<string name="button_save">Save</string>
-<string name="button_clear">Clear</string>
-
-<string name="app_version_history">Version 0.1 - Testing. </string>
-<string name="alert_dialog_ok">Ok</string>
-<string name="app_about_text">About GnuCash Companion for Android.</string>
-<string name="label_transtype">Transaction Type:</string>
-<string-array name="transtype_array">
-    <item>Transfer</item>
-    <item>Invoice</item>
-    <item>Expense Voucher</item>
-</string-array>
+	<string
+		name="menu_prefs">Preferences</string>
+	<string
+		name="pref_app_about">About</string>
+	<string
+		name="pref_app_help">Help</string>
+	<string
+		name="pref_data_file_location">Data File Location</string>
+	<string
+		name="no_files_error">No Files here...</string>
+	<string
+		name="sdcard_error">SD Card Not Found</string>
+	<string
+		name="directory_error">Cannot access directory.</string>
+	<string
+		name="file_choose_title">Choose Data File</string>
+	<string
+		name="no_data_file">No Data File.</string>
+	<string
+		name="message_set_data_file">Set data file location.</string>
+	<string
+		name="button_text_ok">Ok</string>
+	<string
+		name="data_file_compressed">Data file Compressed?</string>
+	<string
+		name="menu_file_pref">Data File Details</string>
+	<string
+		name="menu_save">Save</string>
+	<string
+		name="menu_discard">Discard</string>
+	<string
+		name="menu_app_pref">Application Details</string>
+	<string
+		name="pref_app_version">Version</string>
+	<string
+		name="label_date">Date:</string>
+	<string
+		name="label_description">Description:</string>
+	<string
+		name="label_to">To:</string>
+	<string
+		name="label_from">From:</string>
+	<string
+		name="label_amount">Amount:</string>
+	<string
+		name="button_save">Save</string>
+	<string
+		name="button_clear">Clear</string>
+	<string
+		name="app_version_history">Version 0.1 - Testing.</string>
+	<string
+		name="alert_dialog_ok">Ok</string>
+	<string
+		name="app_about_text">About GnuCash Companion for Android.</string>
+	<string
+		name="label_transtype">Transaction Type:</string>
+	<string
+		name="parser_type">Parser to be used</string>
+	<string
+		name="summary_parser_type">Select a parser type to be used.</string>
+	<string
+		name="dialog_title_parser_types">Select Parser Type</string>
+<string name="error_prefs_not_set">Error in Preferences</string>
+<string name="error_message_prefs_not_set">You should set both Data File location and Parser Type.</string>
 </resources>

@@ -1,11 +1,7 @@
 /**
- * Copyright (C) 2010 Rednus Limited
- *     http://www.rednus.co.uk
- *  
- * Project     : GNCAndroid
- * Package     : rednus.GNCAndroid
- * File        : QuickEntryActivity.java
- * Description : 
+ * Copyright (C) 2010 Rednus Limited http://www.rednus.co.uk
+ * 
+ * #TODO License
  */
 package rednus.gncandroid;
 import java.util.Calendar;
@@ -31,7 +27,10 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 /**
- * @author shyam.avvari
+ * This class displays Quick entry screen.
+ * #TODO add docu when finished. 
+ * 
+ * @author John Gray
  * 
  */
 public class QuickEntryActivity
