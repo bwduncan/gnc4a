@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content">
+<TableLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/book_details_table"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:stretchColumns="1">
+	<TableRow>
+		<TextView
+			android:text="@string/data_file"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/data_file_name"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/book_version"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_version"
+			android:padding="3dip" />
+	</TableRow>
+	<View
+		android:layout_height="2dip"
+		android:background="#FF909090" />
+	<TextView
+		android:text="@string/comp_details"
+		android:gravity="center" />
+	<View
+		android:layout_height="2dip"
+		android:background="#FF909090" />
+	<TableRow>
+		<TextView
+			android:text="@string/comp_name"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_name"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_id"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_id"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_addr"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_addr"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_email"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_email"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_url"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_url"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_phone"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_phone"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_fax"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_fax"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/comp_contact"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/comp_contact"
+			android:padding="3dip" />
+	</TableRow>
+	<View
+		android:layout_height="2dip"
+		android:background="#FF909090" />
+	<TextView
+		android:text="@string/book_deftaxtable"
+		android:gravity="center" />
+	<View
+		android:layout_height="2dip"
+		android:background="#FF909090" />
+	<TableRow>
+		<TextView
+			android:text="@string/customer"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_defcusttaxtable"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/vendor"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_defvendtaxtable"
+			android:padding="3dip" />
+	</TableRow>
+	<View
+		android:layout_height="2dip"
+		android:background="#FF909090" />
+	<TextView
+		android:text="@string/book_counts"
+		android:gravity="center" />
+	<View
+		android:layout_height="2dip"
+		android:background="#FF909090" />
+	<TableRow>
+		<TextView
+			android:text="@string/accounts"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntaccounts"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/transactions"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cnttransactions"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/schedxactions"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntschedxaction"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/customers"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntcustomers"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/vendors"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntvendors"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/employees"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntemployees"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/jobs"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntjobs"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/invoices"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntinvoices"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/entries"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntentries"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/taxtables"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cnttaxtables"
+			android:padding="3dip" />
+	</TableRow>
+	<TableRow>
+		<TextView
+			android:text="@string/billterms"
+			android:padding="3dip" />
+		<TextView
+			android:id="@+id/book_cntbillterms"
+			android:padding="3dip" />
+	</TableRow>
+</TableLayout></ScrollView>

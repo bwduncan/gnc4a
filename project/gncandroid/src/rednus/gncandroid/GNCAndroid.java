@@ -4,6 +4,7 @@
  * #TODO License
  */
 package rednus.gncandroid;
+
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -22,23 +23,22 @@ import android.util.Log;
 public class GNCAndroid extends Application implements
 		OnSharedPreferenceChangeListener {
 	// TAG for this activity
-	private static final String	TAG					= "GNCAndroid";
-	public static final String	SPN					= "gnc4aprefs";
-	public final boolean				localLOGV		= true;
+	private static final String	TAG			= "GNCAndroid";
+	public static final String	SPN			= "gnc4aprefs";
+	public final boolean		localLOGV	= true;
 	// Log information boolean
-	public Resources						res;
-	public GNCDataHandler				gncDataHandler;
-	private String							dataFile		= null;
-	private boolean							gzipFile		= false;
-	private String							parserType	= null;
-	private boolean							reloadFile	= false;
+	public Resources			res;
+	public GNCDataHandler		gncDataHandler;
+	private String				dataFile	= null;
+	private boolean				gzipFile	= false;
+	private boolean				reloadFile	= false;
 	/**
-	 * This method checks preferences and confirms if all information is available
-	 * to read data file.
+	 * This method checks preferences and confirms if all information is
+	 * available to read data file.
 	 */
 	public boolean canReadData() {
 		boolean can = true;
-		if (null == dataFile || null == parserType) {
+		if (null == dataFile ) {
 			can = false;
 		}
 		return can;
@@ -85,8 +85,8 @@ public class GNCAndroid extends Application implements
 		}
 		if (key.equals(res.getString(R.string.pref_data_file_key))) {
 			// get new value
-			String newPath = sp.getString(res.getString(R.string.pref_data_file_key),
-					null);
+			String newPath = sp.getString(
+					res.getString(R.string.pref_data_file_key), null);
 			if (localLOGV) {
 				Log.i(TAG, "New value " + String.valueOf(newPath));
 			}
@@ -94,23 +94,14 @@ public class GNCAndroid extends Application implements
 			setDataFileChanged(newPath);
 		} else if (key.equals(res.getString(R.string.pref_data_file_gzip))) {
 			// get new value
-			gzipFile = sp.getBoolean(res.getString(R.string.pref_data_file_gzip),
-					false);
+			gzipFile = sp.getBoolean(
+					res.getString(R.string.pref_data_file_gzip), false);
 			if (localLOGV) {
 				Log.i(TAG, "New value " + String.valueOf(gzipFile));
 			}
 			// Set to reload file
 			reloadFile = true;
-		} else if (key.equals(res.getString(R.string.pref_parser_type_key))) {
-			// get new value
-			String newType = sp.getString(
-					res.getString(R.string.pref_parser_type_key), null);
-			if (localLOGV) {
-				Log.i(TAG, "New value " + String.valueOf(newType));
-			}
-			// change value
-			setParserTypeChanged(newType);
-		}
+		} 
 	}
 	/**
 	 * Creates new gncDataHandler with values from preferences
@@ -121,7 +112,7 @@ public class GNCAndroid extends Application implements
 		if (localLOGV) {
 			Log.i(TAG, "Reading Data...");
 		}
-		gncDataHandler = new GNCDataHandler(this, dataFile, gzipFile, parserType);
+		gncDataHandler = new GNCDataHandler(this, dataFile, gzipFile);
 		return true;
 	}
 	/**
@@ -132,18 +123,16 @@ public class GNCAndroid extends Application implements
 		// set listener to this
 		sp.registerOnSharedPreferenceChangeListener(this);
 		// read shared preferences to get data file
-		dataFile = sp.getString(res.getString(R.string.pref_data_file_key), null);
+		dataFile = sp.getString(res.getString(R.string.pref_data_file_key),
+				null);
 		if (localLOGV) {
 			Log.i(TAG, "Data file is " + dataFile);
 		}
 		if (dataFile == null)
 			return;
 		// read if data file is compressed
-		gzipFile = sp
-				.getBoolean(res.getString(R.string.pref_data_file_gzip), false);
-		// read parser type to be used
-		parserType = sp.getString(res.getString(R.string.pref_parser_type_key),
-				null);
+		gzipFile = sp.getBoolean(res.getString(R.string.pref_data_file_gzip),
+				false);
 	}
 	/**
 	 * This method check old and new value of data file path and sets flag to
@@ -159,25 +148,6 @@ public class GNCAndroid extends Application implements
 		}
 		// copy new value
 		dataFile = newPath;
-		// add log
-		if (localLOGV) {
-			Log.i(TAG, "Reload file set to " + String.valueOf(reloadFile));
-		}
-	}
-	/**
-	 * This method compares new and old values of parser Type and sets flag to
-	 * reload file
-	 * 
-	 * @param newType
-	 */
-	private void setParserTypeChanged(String newType) {
-		// set file to be reloaded if changed
-		if ((null == parserType && !newType.equals(""))
-				|| (null != parserType && !parserType.equals(newType))) {
-			reloadFile = true;
-		}
-		// copy new value
-		parserType = newType;
 		// add log
 		if (localLOGV) {
 			Log.i(TAG, "Reload file set to " + String.valueOf(reloadFile));

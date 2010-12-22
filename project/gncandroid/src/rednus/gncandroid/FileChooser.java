@@ -5,11 +5,11 @@
  * Description :
  */
 package rednus.gncandroid;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import android.R.drawable;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -27,13 +27,12 @@ import android.widget.TextView;
  * 
  */
 public class FileChooser extends ListActivity {
-	private final String				TAG						= "File Chooser";
+	private final String		TAG				= "File Chooser";
 	protected ArrayList<String>	mFileList;
-	//protected ArrayList<drawable>	mIconList;
-	protected File							mRoot;
+	protected File				mRoot;
 	public static final String	FILEPATH_KEY	= "formpath";
-	private String							pref_name;
-	private GNCAndroid					app;
+	private String				pref_name;
+	private GNCAndroid			app;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,15 +47,17 @@ public class FileChooser extends ListActivity {
 		getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,
 				android.R.drawable.stat_notify_sdcard);
 		// set data
-		//if // It would be nice to start from the directory of the previously selected data file (if not null)
-			this.initialize(app.res.getString(R.string.def_folder));
-		//else {
-		//	this.initialize(new File(app.res.getString(R.string.pref_data_file_key)).getParentFile().getAbsolutePath());
-		//}
+		// if // It would be nice to start from the directory of the previously
+		// selected data file (if not null)
+		this.initialize(app.res.getString(R.string.def_folder));
+		// else {
+		// this.initialize(new
+		// File(app.res.getString(R.string.pref_data_file_key)).getParentFile().getAbsolutePath());
+		// }
 	}
 	private void initialize(String path) {
 		mFileList = new ArrayList<String>();
-		//mFileList.add("..");
+		// mFileList.add("..");
 		if (getDirectory(path)) {
 			getFiles(mRoot);
 			Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
@@ -66,7 +67,7 @@ public class FileChooser extends ListActivity {
 	private void refreshRoot(File f) {
 		mRoot = f;
 		mFileList.clear();
-		if(!f.getName().equalsIgnoreCase("sdcard"))
+		if (!f.getName().equalsIgnoreCase("sdcard"))
 			mFileList.add("..");
 		getFiles(mRoot);
 		Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
@@ -127,12 +128,11 @@ public class FileChooser extends ListActivity {
 			f = new File(mRoot + "/" + mFileList.get(position));
 		if (f.isDirectory()) {
 			this.refreshRoot(f);
-			/*try {
-				this.refreshRoot(f.getCanonicalFile());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
+			/*
+			 * try { this.refreshRoot(f.getCanonicalFile()); } catch
+			 * (IOException e) { // TODO Auto-generated catch block
+			 * e.printStackTrace(); }
+			 */
 			return;
 		}
 		if (app.localLOGV)
