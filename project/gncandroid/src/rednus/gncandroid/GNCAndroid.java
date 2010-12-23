@@ -31,7 +31,7 @@ public class GNCAndroid extends Application implements
 	public GNCDataHandler		gncDataHandler;
 	private String				dataFile	= null;
 	private boolean				gzipFile	= false;
-	private boolean				reloadFile	= false;
+	private boolean				reloadFile	= true;
 	/**
 	 * This method checks preferences and confirms if all information is
 	 * available to read data file.
@@ -113,6 +113,7 @@ public class GNCAndroid extends Application implements
 			Log.i(TAG, "Reading Data...");
 		}
 		gncDataHandler = new GNCDataHandler(this, dataFile, gzipFile);
+		reloadFile = false;
 		return true;
 	}
 	/**

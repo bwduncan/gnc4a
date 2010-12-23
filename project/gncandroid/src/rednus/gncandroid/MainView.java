@@ -39,8 +39,12 @@ public class MainView extends TabActivity {
 		app = (GNCAndroid) getApplication();
 		// first check if data file is set otherwise show preferences
 		// Read data if has
-		if (app.canReadData())
-			new ReadDataTask().execute();
+		if (app.canReadData()) {
+			if ( app.isReloadFile() ) // The data may already be read
+				new ReadDataTask().execute();
+			else
+				showScreen();
+		}
 		else {
 			if (app.localLOGV)
 				Log.i(TAG, "No Data file set.. Forcing preferences...");
