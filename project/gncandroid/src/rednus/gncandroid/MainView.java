@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -183,6 +184,7 @@ public class MainView extends TabActivity {
 		 */
 		@Override
 		protected void onPreExecute() {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 			if (pd == null)
 				pd = ProgressDialog.show(MainView.this, "Please Wait...",
 						"Loading...", true);
@@ -207,6 +209,9 @@ public class MainView extends TabActivity {
 		protected void onPostExecute(Boolean result) {
 			// Refresh View here
 			pd.dismiss();
+			
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			
 			showScreen();
 		}
 	}
