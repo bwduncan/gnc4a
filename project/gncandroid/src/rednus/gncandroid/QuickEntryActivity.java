@@ -4,7 +4,13 @@
  * #TODO License
  */
 package rednus.gncandroid;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.TreeMap;
+
+import rednus.gncandroid.GNCDataHandler.Account;
+import rednus.gncandroid.GNCDataHandler.DataCollection;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -36,6 +42,7 @@ public class QuickEntryActivity
 	private static final String	TAG	= "QuickEntryActivity";
 	// Log information boolean
 	private GNCAndroid			app;
+	private DataCollection		dc;
 	
 	static final int DATE_DIALOG_ID = 0;
 	
@@ -51,6 +58,9 @@ public class QuickEntryActivity
 	private EditText mAmount;
 	private Button dateButton;
 	private Spinner transtypeSpinner;
+	private String[] accounts;
+	ArrayList<String> account_array = new ArrayList<String>();
+
 
 	/*
 	 * (non-Javadoc)
@@ -77,6 +87,9 @@ public class QuickEntryActivity
         transtypeSpinner.setAdapter(adapter);
          
         transtypeSpinner.setOnItemSelectedListener(new TransTypeOnItemSelectedListener());        
+        
+		dc = app.gncDataHandler.getGncData();
+        constructAccountList(dc.book.rootAccountGUID);
 
         setupTransferControls();
         
@@ -99,11 +112,38 @@ public class QuickEntryActivity
 				}
 			}
 		});
-		
      
 		// add log entry
 		if (app.localLOGV)
 			Log.i(TAG, "Activity Finished");
+	}
+	
+	private void constructAccountList(String rootGUID)
+	{
+		getListData(rootGUID, "");
+		accounts = new String[account_array.size()];
+		account_array.toArray(accounts);
+	}
+	
+	private void getListData(String rootGUID, String prefix) {
+		String subGUID;
+		// get root account
+		Account root = dc.accounts.get(rootGUID);
+		if (null == root)
+			return;
+		// clear current list
+		// Add root as Top - only if not Root Account
+		if (!root.name.contains("Root"))
+		{
+			account_array.add(prefix + root.name);
+			prefix = prefix + root.name + ":";
+		}
+		// Read data and fill list
+		Iterator it = root.subList.iterator();
+		while (it.hasNext()) {
+			subGUID = (String) it.next();
+			getListData(subGUID, prefix);
+		}
 	}
 
 	private void setupTransferControls() {
@@ -113,15 +153,10 @@ public class QuickEntryActivity
 		mAmount = (EditText) findViewById(R.id.amount);
 		dateButton = (Button) findViewById(R.id.ButtonDate);
 
-		/*  TODO: Tied the auto completes to data from the xml file
-		ArrayAdapter<String> accountAdapter = new ArrayAdapter<String>(this, R.layout.list_item, mDbHelper.getAllAccounts());
+		/*  TODO: Tied the auto completes to data from the xml file */
+		ArrayAdapter<String> accountAdapter = new ArrayAdapter<String>(this, R.layout.list_item, accounts);
 		mTo.setAdapter(accountAdapter);
 		mFrom.setAdapter(accountAdapter);
-		
-		mTransactions = mDbHelper.getAllTransctions();
-		ArrayAdapter<String> transactionAdapter = new ArrayAdapter<String>(this, R.layout.list_item, mTransactions);
-		mDescription.setAdapter(transactionAdapter);
-		*/
 		
         // get the current date
         final Calendar c = Calendar.getInstance();

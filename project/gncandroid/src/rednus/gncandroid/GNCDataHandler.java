@@ -19,16 +19,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 /**
@@ -42,6 +45,7 @@ public class GNCDataHandler {
 	private static final String	TAG	= "GNCDataHandler"; // TAG for this activity
 	private GNCAndroid			app;					// Application
 	private DataCollection		gncData;				// Data Collection
+	private SQLiteDatabase	    sqliteHandle;
 	/**
 	 * On create the handler create new DataCollection, create input stream for
 	 * file and depending on the parser used the data will be parsed.
@@ -56,8 +60,54 @@ public class GNCDataHandler {
 	public GNCDataHandler(GNCAndroid app, String dataFile, boolean compressed) {
 		this.app = app;
 		// get file reader
+		/*
 		InputStream inStream = getInputStream(dataFile, compressed);
 		this.readFile(inStream);
+		*/
+		try
+		{
+			sqliteHandle = SQLiteDatabase.openDatabase(dataFile,null,SQLiteDatabase.OPEN_READONLY);
+			gncData = new DataCollection();
+			Cursor cursor = sqliteHandle.rawQuery("select * from books",null);
+	        if(cursor.getCount() >0)
+	        {
+	            if (cursor.moveToNext())
+	            {
+	            	// CREATE TABLE books (guid text(32) PRIMARY KEY NOT NULL, root_account_guid text(32) NOT NULL, root_template_guid text(32) NOT NULL);
+	            	gncData.book.GUID = cursor.getString(cursor.getColumnIndex("guid"));
+	            	gncData.book.rootAccountGUID = cursor.getString(cursor.getColumnIndex("root_account_guid"));
+	             }
+	        }
+	        cursor.close();
+		
+			cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and hidden=0 group by accounts.name having bal!=0",null);
+	        if(cursor.getCount() >0)
+	        {
+	            while (cursor.moveToNext())
+	            {
+	            	Account account = new Account();
+	            	// CREATE TABLE accounts (guid text(32) PRIMARY KEY NOT NULL, name text(2048) NOT NULL, account_type text(2048) NOT NULL, commodity_guid text(32), commodity_scu integer NOT NULL, non_std_scu integer NOT NULL, parent_guid text(32), code text(2048), description text(2048), hidden integer, placeholder integer);
+	            	account.GUID = cursor.getString(cursor.getColumnIndex("guid"));
+	            	account.name = cursor.getString(cursor.getColumnIndex("name"));
+	            	account.type = cursor.getString(cursor.getColumnIndex("account_type"));
+	            	account.parentGUID = cursor.getString(cursor.getColumnIndex("parent_guid"));
+	            	account.code = cursor.getString(cursor.getColumnIndex("code"));
+	            	account.description = cursor.getString(cursor.getColumnIndex("description"));
+	            	account.placeholder = cursor.getInt(cursor.getColumnIndex("placeholder"))!=0;
+	            	account.balance = cursor.getDouble(cursor.getColumnIndex("bal"));
+	            	
+	            	gncData.accounts.put(account.GUID, account);
+	             }
+	        }
+	        cursor.close();
+
+            gncData.createAccountTree();
+		}
+		catch (Exception e )
+		{
+			Log.e(TAG, e.getStackTrace().toString());
+		}
+
 	}
 	/**
 	 * Returns the data collection object.
