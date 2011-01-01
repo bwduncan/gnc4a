@@ -80,7 +80,9 @@ public class GNCDataHandler {
 	        }
 	        cursor.close();
 		
-			cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and hidden=0 group by accounts.name having bal!=0",null);
+			//cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and hidden=0 group by accounts.name",null);
+			//cursor = sqliteHandle.rawQuery("select *,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts left outer join splits on splits.account_guid=accounts.guid group by accounts.name",null);
+			cursor = sqliteHandle.rawQuery("select * from accounts",null);
 	        if(cursor.getCount() >0)
 	        {
 	            while (cursor.moveToNext())
@@ -94,13 +96,21 @@ public class GNCDataHandler {
 	            	account.code = cursor.getString(cursor.getColumnIndex("code"));
 	            	account.description = cursor.getString(cursor.getColumnIndex("description"));
 	            	account.placeholder = cursor.getInt(cursor.getColumnIndex("placeholder"))!=0;
-	            	account.balance = cursor.getDouble(cursor.getColumnIndex("bal"));
+	            	
+	            	int balIndex = cursor.getColumnIndex("bal");
+	            	if ( cursor.isNull(balIndex))
+	            		account.balance = 0.0;
+	            	else
+	            		account.balance = cursor.getDouble(balIndex);
 	            	
 	            	gncData.accounts.put(account.GUID, account);
 	             }
 	        }
 	        cursor.close();
 
+			// get full names
+            gncData.updateFullNames();
+			// create account tree
             gncData.createAccountTree();
 		}
 		catch (Exception e )
@@ -248,7 +258,7 @@ public class GNCDataHandler {
 			fullName = account.name;
 			while (null != p) {
 				Account parent = (Account) gncData.accounts.get(p);
-				if (parent.name.equalsIgnoreCase("ROOT")) {
+				if (parent == null || parent.name.equalsIgnoreCase("ROOT")) {
 					break;
 				}
 				fullName = parent.name + ":" + fullName;
