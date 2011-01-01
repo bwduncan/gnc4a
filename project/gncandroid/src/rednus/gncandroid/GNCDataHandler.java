@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -80,6 +81,7 @@ public class GNCDataHandler {
 	        }
 	        cursor.close();
 		
+	        /*
 			//cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and hidden=0 group by accounts.name",null);
 			//cursor = sqliteHandle.rawQuery("select *,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts left outer join splits on splits.account_guid=accounts.guid group by accounts.name",null);
 			cursor = sqliteHandle.rawQuery("select * from accounts",null);
@@ -112,6 +114,7 @@ public class GNCDataHandler {
             gncData.updateFullNames();
 			// create account tree
             gncData.createAccountTree();
+            */
 		}
 		catch (Exception e )
 		{
@@ -119,6 +122,85 @@ public class GNCDataHandler {
 		}
 
 	}
+	
+	public Account GetAccount(String GUID) {
+		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where guid='"+GUID+"'",null);
+        if(cursor.getCount() >0)
+        {
+            if (cursor.moveToNext())
+            {
+            	Account account = this.AccountFromCursor(cursor);
+            	account.hasChildren = this.AccountHasChildren(account.GUID);
+            	account.balance = this.AccountBalance(account.GUID);
+            	            	
+            	return account;
+             }
+            cursor.close();	
+        }
+        return null;
+	}
+	
+	public boolean AccountHasChildren(String GUID) {
+		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+GUID+"' and hidden=0 order by name",null);
+        if(cursor.getCount() >0)
+        	return true;
+        else
+        	return false;
+	}
+	
+	public Account AccountFromCursor(Cursor cursor) {
+    	Account account = new Account();
+    	account.GUID = cursor.getString(cursor.getColumnIndex("guid"));
+    	account.name = cursor.getString(cursor.getColumnIndex("name"));
+    	account.type = cursor.getString(cursor.getColumnIndex("account_type"));
+    	account.parentGUID = cursor.getString(cursor.getColumnIndex("parent_guid"));
+    	account.code = cursor.getString(cursor.getColumnIndex("code"));
+    	account.description = cursor.getString(cursor.getColumnIndex("description"));
+    	account.placeholder = cursor.getInt(cursor.getColumnIndex("placeholder"))!=0;
+    	return account;
+	}
+	
+	public float AccountBalance(String GUID) {
+		Cursor cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and accounts.guid='"+GUID+"' group by accounts.name",null);
+        float retVal = 0.0f;
+		if(cursor.getCount() >0)
+        {
+            if (cursor.moveToNext())
+            {
+            	int balIndex = cursor.getColumnIndex("bal");
+            	if ( !cursor.isNull(balIndex) )
+            		retVal = cursor.getFloat(balIndex);
+             }
+        }
+        cursor.close();
+		return retVal;
+	}
+	
+	public TreeMap<String, Account> GetSubAccounts(String rootGUID) {
+		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+rootGUID+"' and hidden=0 order by name",null);
+        if(cursor.getCount() >0)
+        {
+        	TreeMap<String, Account> listData = new TreeMap<String, Account>();
+        	Account rootAccount = this.GetAccount(rootGUID);
+    		if (!rootAccount.name.contains("Root"))
+    			listData.put(rootGUID,rootAccount);
+            while (cursor.moveToNext())
+            {
+            	Account account = this.AccountFromCursor(cursor);
+            	account.hasChildren = this.AccountHasChildren(account.GUID);
+            	account.balance = this.AccountBalance(account.GUID);
+            	
+            	if ( account.hasChildren || account.balance != 0.0f )
+            		listData.put(account.GUID, account);
+             }
+            cursor.close();	
+            
+            return listData;
+        }
+        else
+        	return null;
+	}
+	
 	/**
 	 * Returns the data collection object.
 	 */

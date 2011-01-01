@@ -71,27 +71,14 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 	 * @param root
 	 */
 	private void getListData(String rootGUID) {
-		int position = 0;
-		String subGUID;
 		// get root account
-		Account root = dc.accounts.get(rootGUID);
-		if (null == root)
+		TreeMap<String, Account> ld = app.gncDataHandler.GetSubAccounts(rootGUID);
+		//Account root = dc.accounts.get(rootGUID);
+		if (null == ld)
 			return;
-		// clear current list
-		listData = new TreeMap<String, Account>();
-		// Add root as Top - only if not Root Account
-		if (!root.name.contains("Root"))
-			listData.put(root.fullName, root);
-		// Read data and fill list
-		Iterator it = root.subList.iterator();
-		while (it.hasNext()) {
-			subGUID = (String) it.next();
-			Account child = (Account) dc.accounts.get(subGUID);
-			position++;
-			listData.put(child.fullName, child);
-		}
-		// set current root guid
-		currRootGUID = root.GUID;
+		listData = ld;
+
+		currRootGUID = rootGUID;
 	}
 	/*
 	 * Event Handler for List item selection
@@ -100,7 +87,6 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 	 * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
 	 * .AdapterView, android.view.View, int, long)
 	 */
-	@Override
 	public void onItemClick(AdapterView<?> parent, View child, int position,
 			long id) {
 		if (app.localLOGV)
@@ -143,7 +129,6 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		 * 
 		 * @see android.widget.Adapter#getCount()
 		 */
-		@Override
 		public int getCount() {
 			return listData.size();
 		}
@@ -152,7 +137,6 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		 * 
 		 * @see android.widget.Adapter#getItem(int)
 		 */
-		@Override
 		public Object getItem(int i) {
 			return listData.get(listData.keySet().toArray()[i]);
 		}
@@ -162,7 +146,6 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		 * 
 		 * @see android.widget.Adapter#getItemId(int)
 		 */
-		@Override
 		public long getItemId(int i) {
 			return i;
 		}
@@ -173,7 +156,6 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		 * @see android.widget.Adapter#getView(int, android.view.View,
 		 * android.view.ViewGroup)
 		 */
-		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			AccountItem item;
 			Account account;
