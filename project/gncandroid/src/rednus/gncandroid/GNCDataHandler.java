@@ -81,7 +81,6 @@ public class GNCDataHandler {
 	        }
 	        cursor.close();
 		
-	        /*
 			//cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and hidden=0 group by accounts.name",null);
 			//cursor = sqliteHandle.rawQuery("select *,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts left outer join splits on splits.account_guid=accounts.guid group by accounts.name",null);
 			cursor = sqliteHandle.rawQuery("select * from accounts",null);
@@ -99,22 +98,13 @@ public class GNCDataHandler {
 	            	account.description = cursor.getString(cursor.getColumnIndex("description"));
 	            	account.placeholder = cursor.getInt(cursor.getColumnIndex("placeholder"))!=0;
 	            	
-	            	int balIndex = cursor.getColumnIndex("bal");
-	            	if ( cursor.isNull(balIndex))
-	            		account.balance = 0.0;
-	            	else
-	            		account.balance = cursor.getDouble(balIndex);
-	            	
 	            	gncData.accounts.put(account.GUID, account);
 	             }
 	        }
 	        cursor.close();
 
-			// get full names
-            gncData.updateFullNames();
-			// create account tree
-            gncData.createAccountTree();
-            */
+	        
+	        gncData.completeCollection();
 		}
 		catch (Exception e )
 		{
@@ -124,52 +114,30 @@ public class GNCDataHandler {
 	}
 	
 	public Account GetAccount(String GUID) {
-		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where guid='"+GUID+"'",null);
-        if(cursor.getCount() >0)
-        {
-            if (cursor.moveToNext())
-            {
-            	Account account = this.AccountFromCursor(cursor);
-            	account.hasChildren = this.AccountHasChildren(account.GUID);
-            	account.balance = this.AccountBalance(account.GUID);
-            	            	
-            	return account;
-             }
-            cursor.close();	
-        }
-        return null;
-	}
-	
-	public boolean AccountHasChildren(String GUID) {
-		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+GUID+"' and hidden=0 order by name",null);
-        if(cursor.getCount() >0)
-        	return true;
-        else
-        	return false;
+		Account account = gncData.accounts.get(GUID);
+		if ( account == null )
+			return null;
+
+		if ( account.balance == null )
+			account.balance = this.AccountBalance(account.GUID);
+		
+		return account;
 	}
 	
 	public Account AccountFromCursor(Cursor cursor) {
-    	Account account = new Account();
-    	account.GUID = cursor.getString(cursor.getColumnIndex("guid"));
-    	account.name = cursor.getString(cursor.getColumnIndex("name"));
-    	account.type = cursor.getString(cursor.getColumnIndex("account_type"));
-    	account.parentGUID = cursor.getString(cursor.getColumnIndex("parent_guid"));
-    	account.code = cursor.getString(cursor.getColumnIndex("code"));
-    	account.description = cursor.getString(cursor.getColumnIndex("description"));
-    	account.placeholder = cursor.getInt(cursor.getColumnIndex("placeholder"))!=0;
-    	return account;
+		return GetAccount(cursor.getString(cursor.getColumnIndex("guid")));
 	}
 	
-	public float AccountBalance(String GUID) {
+	public Double AccountBalance(String GUID) {
 		Cursor cursor = sqliteHandle.rawQuery("select accounts.*,sum(CAST(value_num AS REAL)/value_denom) as bal from accounts,transactions,splits where splits.tx_guid=transactions.guid and splits.account_guid=accounts.guid and accounts.guid='"+GUID+"' group by accounts.name",null);
-        float retVal = 0.0f;
+        Double retVal = 0.0;
 		if(cursor.getCount() >0)
         {
             if (cursor.moveToNext())
             {
             	int balIndex = cursor.getColumnIndex("bal");
             	if ( !cursor.isNull(balIndex) )
-            		retVal = cursor.getFloat(balIndex);
+            		retVal = cursor.getDouble(balIndex);
              }
         }
         cursor.close();
@@ -187,8 +155,6 @@ public class GNCDataHandler {
             while (cursor.moveToNext())
             {
             	Account account = this.AccountFromCursor(cursor);
-            	account.hasChildren = this.AccountHasChildren(account.GUID);
-            	account.balance = this.AccountBalance(account.GUID);
             	
             	if ( account.hasChildren || account.balance != 0.0f )
             		listData.put(account.GUID, account);
@@ -415,7 +381,7 @@ public class GNCDataHandler {
 		public boolean		placeholder;
 		public Commodity	currency;
 		// calculated balance amount
-		public double		balance;
+		public Double		balance;
 		// transactions that belong to account
 		public List<String>	trans		= new ArrayList<String>();
 		public boolean		hasChildren	= false;
