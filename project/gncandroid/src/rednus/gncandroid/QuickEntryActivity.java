@@ -165,6 +165,11 @@ public class QuickEntryActivity
 		fromAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mFrom.setAdapter(fromAdapter);
 		
+		String[] descs = app.gncDataHandler.GetTransactionDescriptions();
+		ArrayAdapter<String> descAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, descs);
+		this.mDescription.setAdapter(descAdapter);
+		
         // get the current date
         final Calendar c = Calendar.getInstance();
 		dateButton.setText(DateFormat.format("MM/dd/yyyy", c));

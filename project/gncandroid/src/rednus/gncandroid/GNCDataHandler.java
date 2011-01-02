@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -198,6 +199,27 @@ public class GNCDataHandler {
         }
         else
         	return null;
+	}
+	
+	public String[] GetTransactionDescriptions() {
+		Calendar cal = Calendar.getInstance();
+		int year = cal.get(Calendar.YEAR);
+		String lastyear = Integer.toString(year-1);
+		
+		Cursor cursor = sqliteHandle.rawQuery("select distinct description from transactions where post_date > "+lastyear+"0101000000",null);
+        int count = cursor.getCount();
+        if ( count == 0 )
+        	return null;
+        
+        String[] values = new String[count];
+		int index = 0;
+        while (cursor.moveToNext())
+        {
+        	values[index++] = cursor.getString(cursor.getColumnIndex("description"));
+        }
+        cursor.close();	
+        
+        return values;
 	}
 	
 	/**
