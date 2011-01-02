@@ -144,8 +144,41 @@ public class GNCDataHandler {
 		return retVal;
 	}
 	
+	public TreeMap<String,String> GetAccountList(boolean expense, boolean longNames) {
+		String query;
+		String types;
+		if ( expense )
+			types = "'EXPENSE'";
+		else
+			types = "'CREDIT', 'BANK'";
+		
+		query = "select guid, name from accounts where account_type in ("+ types +") and hidden=0 and non_std_scu=0 order by name";
+
+		Cursor cursor = sqliteHandle.rawQuery(query,null);
+        if(cursor.getCount() >0)
+        {
+        	TreeMap<String, String> listData = new TreeMap<String, String>();
+            while (cursor.moveToNext())
+            {
+            	Account account = this.AccountFromCursor(cursor);
+            	
+            	if ( longNames )
+            		listData.put(account.fullName, account.GUID);
+            	else
+            		listData.put(account.name, account.GUID);
+
+            }
+            cursor.close();	
+            
+            return listData;
+        }
+        else
+        	return null;
+	
+	}
+	
 	public TreeMap<String, Account> GetSubAccounts(String rootGUID) {
-		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+rootGUID+"' and hidden=0 order by name",null);
+		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+rootGUID+"' and hidden=0 and account_type!='EQUITY' and account_type!='EXPENSE' and account_type!='INCOME' order by name",null);
         if(cursor.getCount() >0)
         {
         	TreeMap<String, Account> listData = new TreeMap<String, Account>();
@@ -156,7 +189,7 @@ public class GNCDataHandler {
             {
             	Account account = this.AccountFromCursor(cursor);
             	
-            	if ( account.hasChildren || account.balance != 0.0f )
+            	if ( account.hasChildren || ((int)(account.balance*100.0)) != 0 )
             		listData.put(account.GUID, account);
              }
             cursor.close();	

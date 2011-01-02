@@ -53,8 +53,8 @@ public class QuickEntryActivity
     private int mDay;
     
 	private AutoCompleteTextView mDescription;
-	private AutoCompleteTextView mTo;
-	private AutoCompleteTextView mFrom;
+	private Spinner mTo;
+	private Spinner mFrom;
 	private EditText mAmount;
 	private Button dateButton;
 	private Spinner transtypeSpinner;
@@ -106,8 +106,6 @@ public class QuickEntryActivity
 					dateButton.setText(DateFormat.format("MM/dd/yyyy", c));
 					
 					mDescription.setText("");
-					mTo.setText("");
-					mFrom.setText("");
 					mAmount.setText("0.00");
 				}
 			}
@@ -148,15 +146,24 @@ public class QuickEntryActivity
 
 	private void setupTransferControls() {
 		mDescription = (AutoCompleteTextView) findViewById(R.id.EditTextDescriptoin);
-		mTo = (AutoCompleteTextView) findViewById(R.id.to);
-		mFrom = (AutoCompleteTextView) findViewById(R.id.from);
+		mTo = (Spinner) findViewById(R.id.spinner_to);
+		mFrom = (Spinner) findViewById(R.id.spinner_from);
 		mAmount = (EditText) findViewById(R.id.amount);
 		dateButton = (Button) findViewById(R.id.ButtonDate);
 
-		/*  TODO: Tied the auto completes to data from the xml file */
-		ArrayAdapter<String> accountAdapter = new ArrayAdapter<String>(this, R.layout.list_item, accounts);
-		mTo.setAdapter(accountAdapter);
-		mFrom.setAdapter(accountAdapter);
+		TreeMap<String,String> toAccounts = app.gncDataHandler.GetAccountList(true, false);
+		String[] toAccountNames = new String[toAccounts.size()];
+		toAccounts.keySet().toArray(toAccountNames);
+		ArrayAdapter<String> toAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, toAccountNames);
+		toAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mTo.setAdapter(toAdapter);
+
+		TreeMap<String,String> fromAccounts = app.gncDataHandler.GetAccountList(false, false);
+		String[] fromAccountNames = new String[fromAccounts.size()];
+		fromAccounts.keySet().toArray(fromAccountNames);
+		ArrayAdapter<String> fromAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fromAccountNames);
+		fromAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mFrom.setAdapter(fromAdapter);
 		
         // get the current date
         final Calendar c = Calendar.getInstance();

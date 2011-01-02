@@ -86,12 +86,13 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 		android:text="@string/label_to"
 		>
 		</TextView>
-		<AutoCompleteTextView
-		android:id="@+id/to"
+		
+		<Spinner 
+		android:id="@+id/spinner_to" 
+		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
-		android:text=""
-		android:layout_width="match_parent">
-		</AutoCompleteTextView>
+		>
+		</Spinner>
 	</TableRow>
 	<TableRow
 	android:id="@+id/widget49"
@@ -107,12 +108,12 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 		android:text="@string/label_from"
 		>
 		</TextView>
-		<AutoCompleteTextView
-		android:id="@+id/from"
+		<Spinner 
+		android:id="@+id/spinner_from" 
+		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
-		android:text=""
-		android:layout_width="match_parent">
-		</AutoCompleteTextView>
+		>
+		</Spinner>
 	</TableRow>
 	<TableRow
 	android:id="@+id/widget47"
