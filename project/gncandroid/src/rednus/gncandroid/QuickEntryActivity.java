@@ -11,15 +11,17 @@ import java.util.TreeMap;
 
 import rednus.gncandroid.GNCDataHandler.Account;
 import rednus.gncandroid.GNCDataHandler.DataCollection;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.CompletionInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -28,6 +30,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableLayout;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 /**
  * This class displays Quick entry screen.
@@ -59,6 +62,7 @@ public class QuickEntryActivity
 	private Button dateButton;
 	private Spinner transtypeSpinner;
 	private String[] accounts;
+	private String[] descs;
 	ArrayList<String> account_array = new ArrayList<String>();
 
 
@@ -106,7 +110,7 @@ public class QuickEntryActivity
 					dateButton.setText(DateFormat.format("MM/dd/yyyy", c));
 					
 					mDescription.setText("");
-					mAmount.setText("0.00");
+					mAmount.setText("");
 				}
 			}
 		});
@@ -165,10 +169,10 @@ public class QuickEntryActivity
 		fromAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mFrom.setAdapter(fromAdapter);
 		
-		String[] descs = app.gncDataHandler.GetTransactionDescriptions();
+		descs = app.gncDataHandler.GetTransactionDescriptions();
 		ArrayAdapter<String> descAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, descs);
-		this.mDescription.setAdapter(descAdapter);
+		mDescription.setAdapter(descAdapter);
 		
         // get the current date
         final Calendar c = Calendar.getInstance();
@@ -219,8 +223,7 @@ public class QuickEntryActivity
             
     public class TransTypeOnItemSelectedListener implements OnItemSelectedListener {
 
-        public void onItemSelected(AdapterView<?> parent,
-            View view, int pos, long id) {
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         	
         	if ( currentView != pos )
         	{
@@ -261,6 +264,20 @@ public class QuickEntryActivity
         public void onNothingSelected(AdapterView parent) {
           // Do nothing.
         }
+    }
+    
+    public class DescriptionAutoComplete extends AutoCompleteTextView {
+		
+		public DescriptionAutoComplete(Context context, AttributeSet attrs) {
+			super(context, attrs);
+		}
+
+    	@Override
+		public void onCommitCompletion(CompletionInfo completion) {
+			
+			Toast.makeText(QuickEntryActivity.this, completion.getText(), Toast.LENGTH_LONG).show();
+		}
+    	
     }
    
 }
