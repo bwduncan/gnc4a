@@ -222,6 +222,34 @@ public class GNCDataHandler {
         return values;
 	}
 	
+	public String[] GetAccountsFromDescription(String desc) {
+		String[] values = null;
+		
+		Cursor cursor = sqliteHandle.rawQuery("select * from transactions where description='Superfresh' order by post_date desc limit 1",null);
+        int count = cursor.getCount();
+        if ( count != 0 )
+        {
+	        if (cursor.moveToNext())
+	        {
+	        	String transGUID = cursor.getString(cursor.getColumnIndex("guid"));
+	    		Cursor SplitCursor = sqliteHandle.rawQuery("select account_guid from splits where tx_guid='"+transGUID+"';",null);
+	            int splitCount = cursor.getCount();
+	            if ( splitCount != 0 )
+	            {
+			        values = new String[splitCount];
+					int index = 0;
+			        while (SplitCursor.moveToNext())
+			        {
+			        	values[index++] = SplitCursor.getString(cursor.getColumnIndex("account_guid"));
+			        }
+	            }
+		        SplitCursor.close();	
+	       }
+        }
+        cursor.close();	
+		return values;
+	}
+	
 	/**
 	 * Returns the data collection object.
 	 */

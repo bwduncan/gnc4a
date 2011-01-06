@@ -14,14 +14,11 @@ import rednus.gncandroid.GNCDataHandler.DataCollection;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.CompletionInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -30,7 +27,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableLayout;
-import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 /**
  * This class displays Quick entry screen.
@@ -173,8 +170,9 @@ public class QuickEntryActivity
 		ArrayAdapter<String> descAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, descs);
 		mDescription.setAdapter(descAdapter);
+		mDescription.setOnItemClickListener(new DescriptionOnItemClickListener());
 		
-        // get the current date
+		// get the current date
         final Calendar c = Calendar.getInstance();
 		dateButton.setText(DateFormat.format("MM/dd/yyyy", c));
 		
@@ -264,20 +262,15 @@ public class QuickEntryActivity
         public void onNothingSelected(AdapterView parent) {
           // Do nothing.
         }
-    }
-    
-    public class DescriptionAutoComplete extends AutoCompleteTextView {
-		
-		public DescriptionAutoComplete(Context context, AttributeSet attrs) {
-			super(context, attrs);
+    }   
+     
+	public class DescriptionOnItemClickListener implements OnItemClickListener {
+	  	@Override
+		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	  		String[] accountGUIDs = app.gncDataHandler.GetAccountsFromDescription(mDescription.getText().toString());
+	  		for (int i=0;i<accountGUIDs.length;i++) {
+	  			
+	  		}
 		}
-
-    	@Override
-		public void onCommitCompletion(CompletionInfo completion) {
-			
-			Toast.makeText(QuickEntryActivity.this, completion.getText(), Toast.LENGTH_LONG).show();
-		}
-    	
-    }
-   
+	}   
 }
