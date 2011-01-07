@@ -262,52 +262,24 @@ public class GNCDataHandler {
 			// CREATE TABLE transactions (guid text(32) PRIMARY KEY NOT NULL, currency_guid text(32) NOT NULL, num text(2048) NOT NULL, post_date text(14), enter_date text(14), description text(2048));
 	
 			// First the transaction
-			/*
-	        ContentValues transValues = new ContentValues(5);
-			transValues.put("guid", tx_guid);
-			transValues.put("currency_guid", "d42c51800f472526f265de2711a36020"); // TODO need to figure how to determine the currency guid
-			transValues.put("post_date", postDate);
-			transValues.put("enter_date", enterDate);
-			transValues.put("description", description);
-			long retVal = sqliteHandle.insert("transactions", null, transValues);
-			*/
-			sqliteHandle.rawQuery("insert into transactions(guid,currency_guid,post_date,enter_date,description) values(?,?,?,?,?)", new String[] {tx_guid,"d42c51800f472526f265de2711a36020", postDate, enterDate, description} );
+	        String transQuery = "insert into transactions(guid,currency_guid,num,post_date,enter_date,description)" +
+	        " values('"+tx_guid+"','d42c51800f472526f265de2711a36020','"+postDate+"','','"+enterDate+"','"+description+"')";
+			Log.v(TAG, transQuery);
+			sqliteHandle.rawQuery(transQuery,null);
 			
 			double d = Double.parseDouble(amount);
 			int demom = 100;
 			int value = (int)(d*demom);
 			
-			/*
-			ContentValues toValues = new ContentValues(8);
-			toValues.put("guid", GenGUID());
-			toValues.put("tx_guid", tx_guid);
-			toValues.put("account_guid", toGUID);
-			toValues.put("reconcile_state", "n");
-			toValues.put("value_num",value);
-			toValues.put("value_denom",demom);
-			toValues.put("quantity_num",value);
-			toValues.put("quantity_denom",demom);
-			retVal = sqliteHandle.insert("splits", null, toValues);
-			*/
-			sqliteHandle.rawQuery(
-					"insert into splits(guid,tx_guid,account_guid,reconcile_state,value_num,value_denom,quantity_num,quantity_denom) values(?,?,?,?,"+value+",100,"+value+",100)",
-					new String[] {GenGUID(), tx_guid,toGUID, "n"} );
+			String toQuery = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
+			" values('"+GenGUID()+"','"+tx_guid+"','"+toGUID+"','','','n',"+value+",100,"+value+",100)";
+			Log.v(TAG, toQuery);
+			sqliteHandle.rawQuery(toQuery,null );
 
-			/*
-			ContentValues fromValues = new ContentValues(8);
-			fromValues.put("guid", GenGUID());
-			fromValues.put("tx_guid", tx_guid);
-			fromValues.put("account_guid", fromGUID);
-			fromValues.put("reconcile_state", "n");
-			fromValues.put("value_num",-value);
-			fromValues.put("value_denom",demom);
-			fromValues.put("quantity_num",-value);
-			fromValues.put("quantity_denom",demom);
-			retVal = sqliteHandle.insert("splits", null, fromValues);
-			*/
-			sqliteHandle.rawQuery(
-					"insert into splits(guid,tx_guid,account_guid,reconcile_state,value_num,value_denom,quantity_num,quantity_denom) values(?,?,?,?,"+ -value +",100,"+ -value +",100)",
-					new String[] {GenGUID(), tx_guid,fromGUID, "n"} );
+			String fromQuery = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
+			" values('"+GenGUID()+"','"+tx_guid+"','"+fromGUID+"','','','n',"+ -value +",100,"+ -value +",100)";
+			Log.v(TAG, fromQuery);
+			sqliteHandle.rawQuery(fromQuery,null);
 
 			sqliteHandle.setTransactionSuccessful();
 			
@@ -338,6 +310,7 @@ public class GNCDataHandler {
         			accountGUIDs[index++] = accountsCursor.getString(cursor.getColumnIndex("guid"));
         		}
         	}
+        	accountsCursor.close();
         }
         cursor.close();	
         return accountGUIDs;
