@@ -4,13 +4,9 @@
  * #TODO License
  */
 package rednus.gncandroid;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.TreeMap;
 
-import rednus.gncandroid.GNCDataHandler.Account;
-import rednus.gncandroid.GNCDataHandler.DataCollection;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -31,7 +27,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 /**
  * This class displays Quick entry screen.
- * #TODO add docu when finished. 
  * 
  * @author John Gray
  * 
@@ -42,7 +37,6 @@ public class QuickEntryActivity
 	private static final String	TAG	= "QuickEntryActivity";
 	// Log information boolean
 	private GNCAndroid			app;
-	private DataCollection		dc;
 	
 	static final int DATE_DIALOG_ID = 0;
 	
@@ -58,9 +52,12 @@ public class QuickEntryActivity
 	private EditText mAmount;
 	private Button dateButton;
 	private Spinner transtypeSpinner;
-	private String[] accounts;
 	private String[] descs;
-	ArrayList<String> account_array = new ArrayList<String>();
+
+	private String[] toAccountNames;
+	private String[] toAccountGUIDs;
+	private String[] fromAccountNames;
+	private String[] fromAccountGUIDs;
 
 
 	/*
@@ -89,14 +86,22 @@ public class QuickEntryActivity
          
         transtypeSpinner.setOnItemSelectedListener(new TransTypeOnItemSelectedListener());        
         
-		dc = app.gncDataHandler.getGncData();
-        constructAccountList(dc.book.rootAccountGUID);
+		constructAccountLists();
 
         setupTransferControls();
         
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// TODO Save goes here
+				int toPos = mTo.getSelectedItemPosition();
+				int fromPos = mFrom.getSelectedItemPosition();
+
+				String toGUID = toAccountGUIDs[toPos];
+				String fromGUID = fromAccountGUIDs[fromPos];
+				
+				String date = dateButton.getText().toString();
+				String amount = mAmount.getText().toString();
+				
+				app.gncDataHandler.insertTransaction( toGUID,  fromGUID, mDescription.getText().toString(), amount, date);
 			}
 		});
 		
@@ -116,33 +121,21 @@ public class QuickEntryActivity
 		if (app.localLOGV)
 			Log.i(TAG, "Activity Finished");
 	}
-	
-	private void constructAccountList(String rootGUID)
-	{
-		getListData(rootGUID, "");
-		accounts = new String[account_array.size()];
-		account_array.toArray(accounts);
-	}
-	
-	private void getListData(String rootGUID, String prefix) {
-		String subGUID;
-		// get root account
-		Account root = dc.accounts.get(rootGUID);
-		if (null == root)
-			return;
-		// clear current list
-		// Add root as Top - only if not Root Account
-		if (!root.name.contains("Root"))
-		{
-			account_array.add(prefix + root.name);
-			prefix = prefix + root.name + ":";
-		}
-		// Read data and fill list
-		Iterator it = root.subList.iterator();
-		while (it.hasNext()) {
-			subGUID = (String) it.next();
-			getListData(subGUID, prefix);
-		}
+
+	private void constructAccountLists() {
+		TreeMap<String,String> toAccounts = app.gncDataHandler.GetAccountList(true, false);
+		toAccountNames = new String[toAccounts.size()];
+		toAccountGUIDs = new String[toAccounts.size()];
+		toAccounts.keySet().toArray(toAccountNames);
+		for (int i=0;i<toAccounts.size();i++)
+			toAccountGUIDs[i] = toAccounts.get(toAccountNames[i]);
+
+		TreeMap<String,String> fromAccounts = app.gncDataHandler.GetAccountList(false, false);
+		fromAccountNames = new String[fromAccounts.size()];
+		fromAccountGUIDs = new String[fromAccounts.size()];
+		fromAccounts.keySet().toArray(fromAccountNames);
+		for (int i=0;i<fromAccounts.size();i++)
+			fromAccountGUIDs[i] = fromAccounts.get(fromAccountNames[i]);
 	}
 
 	private void setupTransferControls() {
@@ -152,16 +145,10 @@ public class QuickEntryActivity
 		mAmount = (EditText) findViewById(R.id.amount);
 		dateButton = (Button) findViewById(R.id.ButtonDate);
 
-		TreeMap<String,String> toAccounts = app.gncDataHandler.GetAccountList(true, false);
-		String[] toAccountNames = new String[toAccounts.size()];
-		toAccounts.keySet().toArray(toAccountNames);
 		ArrayAdapter<String> toAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, toAccountNames);
 		toAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mTo.setAdapter(toAdapter);
 
-		TreeMap<String,String> fromAccounts = app.gncDataHandler.GetAccountList(false, false);
-		String[] fromAccountNames = new String[fromAccounts.size()];
-		fromAccounts.keySet().toArray(fromAccountNames);
 		ArrayAdapter<String> fromAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fromAccountNames);
 		fromAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mFrom.setAdapter(fromAdapter);
@@ -259,17 +246,25 @@ public class QuickEntryActivity
 
         }
 
-        public void onNothingSelected(AdapterView parent) {
+        public void onNothingSelected(AdapterView<?> parent) {
           // Do nothing.
         }
     }   
      
 	public class DescriptionOnItemClickListener implements OnItemClickListener {
-	  	@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-	  		String[] accountGUIDs = app.gncDataHandler.GetAccountsFromDescription(mDescription.getText().toString());
+	  	public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+	  		String[] accountGUIDs = app.gncDataHandler.GetAccountsFromTransactionDescription(mDescription.getText().toString());
 	  		for (int i=0;i<accountGUIDs.length;i++) {
-	  			
+	  			for (int j=0;j<toAccountGUIDs.length;j++)
+	  				if ( toAccountGUIDs[j].equals(accountGUIDs[i]) ) {
+	  					mTo.setSelection(j);
+	  					break;
+	  				}
+	  			for (int k=0;k<fromAccountGUIDs.length;k++)
+	  				if ( fromAccountGUIDs[k].equals(accountGUIDs[i]) ) {
+	  					mFrom.setSelection(k);
+	  					break;
+	  				}
 	  		}
 		}
 	}   

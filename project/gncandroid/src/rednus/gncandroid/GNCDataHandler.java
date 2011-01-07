@@ -15,12 +15,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,6 +34,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -68,7 +71,7 @@ public class GNCDataHandler {
 		*/
 		try
 		{
-			sqliteHandle = SQLiteDatabase.openDatabase(dataFile,null,SQLiteDatabase.OPEN_READONLY);
+			sqliteHandle = SQLiteDatabase.openDatabase(dataFile,null,SQLiteDatabase.OPEN_READWRITE);
 			gncData = new DataCollection();
 			Cursor cursor = sqliteHandle.rawQuery("select * from books",null);
 	        if(cursor.getCount() >0)
@@ -222,32 +225,122 @@ public class GNCDataHandler {
         return values;
 	}
 	
-	public String[] GetAccountsFromDescription(String desc) {
-		String[] values = null;
+	private String GenGUID() {
+		UUID uuid = UUID.randomUUID();
+		String GUID = Long.toHexString(uuid.getMostSignificantBits())+Long.toHexString(uuid.getLeastSignificantBits());
+		return GUID;
+	}
+	
+	public boolean insertTransaction(String toGUID, String fromGUID, String description, String amount, String date) {
+
+		try {
+	        sqliteHandle.beginTransaction();
+	        
+			String tx_guid = GenGUID();
+	
+			Log.i(TAG, "insertTransaction " + description+ "\n" +
+					tx_guid + "\n" +
+					toGUID + "\n" +
+					fromGUID + "\n" +
+					date + "\n" +
+					amount + "\n");
+			
+	        final Calendar c = Calendar.getInstance();
+	        
+	        Date now = new Date();
+	        DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+	        String postDate = formatter.format(now);
+	        
+	        DateFormat simpleFormat = new SimpleDateFormat("MM/dd/yyyy");
+	        Date enter = simpleFormat.parse(date);
+	        
+	        String enterDate = formatter.format(enter);
+	
+			
+			// We need to insert 3 records (a transaction and two splits)
+			// CREATE TABLE splits (guid text(32) PRIMARY KEY NOT NULL, tx_guid text(32) NOT NULL, account_guid text(32) NOT NULL, memo text(2048) NOT NULL, action text(2048) NOT NULL, reconcile_state text(1) NOT NULL, reconcile_date text(14), value_num bigint NOT NULL, value_denom bigint NOT NULL, quantity_num bigint NOT NULL, quantity_denom bigint NOT NULL, lot_guid text(32));
+			// CREATE TABLE transactions (guid text(32) PRIMARY KEY NOT NULL, currency_guid text(32) NOT NULL, num text(2048) NOT NULL, post_date text(14), enter_date text(14), description text(2048));
+	
+			// First the transaction
+			/*
+	        ContentValues transValues = new ContentValues(5);
+			transValues.put("guid", tx_guid);
+			transValues.put("currency_guid", "d42c51800f472526f265de2711a36020"); // TODO need to figure how to determine the currency guid
+			transValues.put("post_date", postDate);
+			transValues.put("enter_date", enterDate);
+			transValues.put("description", description);
+			long retVal = sqliteHandle.insert("transactions", null, transValues);
+			*/
+			sqliteHandle.rawQuery("insert into transactions(guid,currency_guid,post_date,enter_date,description) values(?,?,?,?,?)", new String[] {tx_guid,"d42c51800f472526f265de2711a36020", postDate, enterDate, description} );
+			
+			double d = Double.parseDouble(amount);
+			int demom = 100;
+			int value = (int)(d*demom);
+			
+			/*
+			ContentValues toValues = new ContentValues(8);
+			toValues.put("guid", GenGUID());
+			toValues.put("tx_guid", tx_guid);
+			toValues.put("account_guid", toGUID);
+			toValues.put("reconcile_state", "n");
+			toValues.put("value_num",value);
+			toValues.put("value_denom",demom);
+			toValues.put("quantity_num",value);
+			toValues.put("quantity_denom",demom);
+			retVal = sqliteHandle.insert("splits", null, toValues);
+			*/
+			sqliteHandle.rawQuery(
+					"insert into splits(guid,tx_guid,account_guid,reconcile_state,value_num,value_denom,quantity_num,quantity_denom) values(?,?,?,?,"+value+",100,"+value+",100)",
+					new String[] {GenGUID(), tx_guid,toGUID, "n"} );
+
+			/*
+			ContentValues fromValues = new ContentValues(8);
+			fromValues.put("guid", GenGUID());
+			fromValues.put("tx_guid", tx_guid);
+			fromValues.put("account_guid", fromGUID);
+			fromValues.put("reconcile_state", "n");
+			fromValues.put("value_num",-value);
+			fromValues.put("value_denom",demom);
+			fromValues.put("quantity_num",-value);
+			fromValues.put("quantity_denom",demom);
+			retVal = sqliteHandle.insert("splits", null, fromValues);
+			*/
+			sqliteHandle.rawQuery(
+					"insert into splits(guid,tx_guid,account_guid,reconcile_state,value_num,value_denom,quantity_num,quantity_denom) values(?,?,?,?,"+ -value +",100,"+ -value +",100)",
+					new String[] {GenGUID(), tx_guid,fromGUID, "n"} );
+
+			sqliteHandle.setTransactionSuccessful();
+			
+			return true;
+		} catch (Exception e) {
+			return false;
+		} finally {
+			sqliteHandle.endTransaction();
+		}
 		
-		Cursor cursor = sqliteHandle.rawQuery("select * from transactions where description='Superfresh' order by post_date desc limit 1",null);
-        int count = cursor.getCount();
-        if ( count != 0 )
+
+	}
+	
+	public String[] GetAccountsFromTransactionDescription(String description) {
+		int index = 0;
+		String[] accountGUIDs = null;
+		String transSQL = "select guid from transactions where description='"+description+"' order by post_date desc limit 1;";
+		Cursor cursor = sqliteHandle.rawQuery(transSQL,null);
+        if ( cursor.getCount() > 0 && cursor.moveToNext() )
         {
-	        if (cursor.moveToNext())
-	        {
-	        	String transGUID = cursor.getString(cursor.getColumnIndex("guid"));
-	    		Cursor SplitCursor = sqliteHandle.rawQuery("select account_guid from splits where tx_guid='"+transGUID+"';",null);
-	            int splitCount = cursor.getCount();
-	            if ( splitCount != 0 )
-	            {
-			        values = new String[splitCount];
-					int index = 0;
-			        while (SplitCursor.moveToNext())
-			        {
-			        	values[index++] = SplitCursor.getString(cursor.getColumnIndex("account_guid"));
-			        }
-	            }
-		        SplitCursor.close();	
-	       }
+        	String transGUID = cursor.getString(cursor.getColumnIndex("guid"));
+        	String accountsSQL = "select accounts.guid from accounts,splits where tx_guid='"+transGUID+"' and account_guid=accounts.guid";
+        	Cursor accountsCursor = sqliteHandle.rawQuery(accountsSQL,null);
+        	int count = accountsCursor.getCount();
+        	if ( count > 0 ) {
+        		accountGUIDs = new String[count];
+        		while ( accountsCursor.moveToNext() ) {
+        			accountGUIDs[index++] = accountsCursor.getString(cursor.getColumnIndex("guid"));
+        		}
+        	}
         }
         cursor.close();	
-		return values;
+        return accountGUIDs;
 	}
 	
 	/**

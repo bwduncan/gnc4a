@@ -24,7 +24,7 @@
 		<activity android:name=".QuickEntryActivity"></activity>
 	<activity android:name=".BookDetailsActivity"></activity>
 </application>
-	<uses-sdk android:minSdkVersion="8" />
 	<permission android:label="Access SD Card"
 		android:name="android.permission.WRITE_EXTERNAL_STORAGE"></permission>
+
 </manifest>
