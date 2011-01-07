@@ -6,8 +6,6 @@
 package rednus.gncandroid;
 
 import java.text.NumberFormat;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import rednus.gncandroid.GNCDataHandler.Account;

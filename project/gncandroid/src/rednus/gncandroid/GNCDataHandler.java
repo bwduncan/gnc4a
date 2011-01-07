@@ -6,10 +6,6 @@
  */
 package rednus.gncandroid;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,16 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -50,6 +36,12 @@ public class GNCDataHandler {
 	private GNCAndroid			app;					// Application
 	private DataCollection		gncData;				// Data Collection
 	private SQLiteDatabase	    sqliteHandle;
+	
+	private final String transInsert = "insert into transactions(guid,currency_guid,num,post_date,enter_date,description) values(?,?,?,?,?,?)";	        		
+	private final String splitsInsert = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
+	" values(?,?,?,?,?,?,?,?,?,?)";
+	
+
 	/**
 	 * On create the handler create new DataCollection, create input stream for
 	 * file and depending on the parser used the data will be parsed.
@@ -116,19 +108,19 @@ public class GNCDataHandler {
 
 	}
 	
-	public Account GetAccount(String GUID) {
+	public Account GetAccount(String GUID, boolean getBalance) {
 		Account account = gncData.accounts.get(GUID);
 		if ( account == null )
 			return null;
 
-		if ( account.balance == null )
+		if ( account.balance == null && getBalance)
 			account.balance = this.AccountBalance(account.GUID);
 		
 		return account;
 	}
 	
-	public Account AccountFromCursor(Cursor cursor) {
-		return GetAccount(cursor.getString(cursor.getColumnIndex("guid")));
+	public Account AccountFromCursor(Cursor cursor, boolean getBalance) {
+		return GetAccount(cursor.getString(cursor.getColumnIndex("guid")),getBalance);
 	}
 	
 	public Double AccountBalance(String GUID) {
@@ -163,7 +155,7 @@ public class GNCDataHandler {
         	TreeMap<String, String> listData = new TreeMap<String, String>();
             while (cursor.moveToNext())
             {
-            	Account account = this.AccountFromCursor(cursor);
+            	Account account = this.AccountFromCursor(cursor,false);
             	
             	if ( longNames )
             		listData.put(account.fullName, account.GUID);
@@ -185,12 +177,12 @@ public class GNCDataHandler {
         if(cursor.getCount() >0)
         {
         	TreeMap<String, Account> listData = new TreeMap<String, Account>();
-        	Account rootAccount = this.GetAccount(rootGUID);
+        	Account rootAccount = this.GetAccount(rootGUID,true);
     		if (!rootAccount.name.contains("Root"))
     			listData.put(rootGUID,rootAccount);
             while (cursor.moveToNext())
             {
-            	Account account = this.AccountFromCursor(cursor);
+            	Account account = this.AccountFromCursor(cursor,true);
             	
             	if ( account.hasChildren || ((int)(account.balance*100.0)) != 0 )
             		listData.put(account.GUID, account);
@@ -236,13 +228,6 @@ public class GNCDataHandler {
 	        sqliteHandle.beginTransaction();
 	        
 			String tx_guid = GenGUID();
-	
-			Log.i(TAG, "insertTransaction " + description+ "\n" +
-					tx_guid + "\n" +
-					toGUID + "\n" +
-					fromGUID + "\n" +
-					date + "\n" +
-					amount + "\n");
 			
 	        Date now = new Date();
 	        DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -259,24 +244,18 @@ public class GNCDataHandler {
 			// CREATE TABLE transactions (guid text(32) PRIMARY KEY NOT NULL, currency_guid text(32) NOT NULL, num text(2048) NOT NULL, post_date text(14), enter_date text(14), description text(2048));
 	
 			// First the transaction
-	        String transQuery = "insert into transactions(guid,currency_guid,num,post_date,enter_date,description)" +
-	        " values('"+tx_guid+"','d42c51800f472526f265de2711a36020','"+postDate+"','','"+enterDate+"','"+description+"')";
-			Log.v(TAG, transQuery);
-			sqliteHandle.execSQL(transQuery);
+			Object[] transArgs = {tx_guid, "d42c51800f472526f265de2711a36020",postDate,"",enterDate,description};
+			sqliteHandle.execSQL(transInsert, transArgs );
 			
 			double d = Double.parseDouble(amount);
 			int demom = 100;
 			int value = (int)(d*demom);
 			
-			String toQuery = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
-			" values('"+GenGUID()+"','"+tx_guid+"','"+toGUID+"','','','n',"+value+",100,"+value+",100)";
-			Log.v(TAG, toQuery);
-			sqliteHandle.execSQL(toQuery);
+			Object[] toArgs = {GenGUID(),tx_guid,toGUID,"","","n",value,100,value,100};
+			sqliteHandle.execSQL(splitsInsert,toArgs);
 
-			String fromQuery = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
-			" values('"+GenGUID()+"','"+tx_guid+"','"+fromGUID+"','','','n',"+ -value +",100,"+ -value +",100)";
-			Log.v(TAG, fromQuery);
-			sqliteHandle.execSQL(fromQuery);
+			Object[] fromArgs = {GenGUID(),tx_guid,fromGUID,"","","n",-value,100,-value,100};
+			sqliteHandle.execSQL(splitsInsert,fromArgs);
 
 			sqliteHandle.setTransactionSuccessful();
 			
@@ -319,79 +298,6 @@ public class GNCDataHandler {
 	public DataCollection getGncData() {
 		return gncData;
 	}
-	/**
-	 * This method returns the InputStream. If the compressed flag is set then
-	 * the return is of GZipInputStream type, otherwise FileInputStream.
-	 * 
-	 * @param filePath
-	 * @param compressed
-	 * @return
-	 */
-	private InputStream getInputStream(String filePath, boolean compressed) {
-		InputStream inStream;
-		// Get the input stream
-		try {
-			inStream = new FileInputStream(filePath);
-		} catch (FileNotFoundException e) {
-			Log.i(TAG, "File " + filePath + " not found...");
-			throw new RuntimeException(e);
-		}
-		// check if it is compressed then get gzip stream
-		if (compressed)
-			try {
-				inStream = new GZIPInputStream(inStream);
-			} catch (IOException e) {
-				Log.i(TAG, "Gzip File " + filePath + " cannot be read...");
-				throw new RuntimeException(e);
-			}
-		return inStream;
-	}
-	/**
-	 * This method creates SAXDataParser and parses the data (Fast processing
-	 * but less functionality)
-	 * 
-	 * @param inStream
-	 */
-	private void readFile(InputStream inStream) {
-		XMLReader parser;
-		// get parser
-		if (app.localLOGV)
-			Log.i(TAG, "Getting Parser");
-		try {
-			parser = SAXParserFactory.newInstance().newSAXParser()
-					.getXMLReader();
-		} catch (ParserConfigurationException e) {
-			if (app.localLOGV)
-				Log.i(TAG, "Cant Get Parser - " + e.getMessage());
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			if (app.localLOGV)
-				Log.i(TAG, "Cant Get Parser - " + e.getMessage());
-			throw new RuntimeException(e);
-		}
-		if (app.localLOGV)
-			Log.i(TAG, "Getting Parser..Done");
-		// set handlers
-		XMLHandler xmlh = new XMLHandler();
-		parser.setContentHandler(xmlh);
-		parser.setErrorHandler(xmlh);
-		// parse the data
-		if (app.localLOGV)
-			Log.i(TAG, "Parsing Data");
-		try {
-			parser.parse(new InputSource(inStream));
-		} catch (IOException e) {
-			if (app.localLOGV)
-				Log.i(TAG, "File cannot be read");
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			if (app.localLOGV)
-				Log.i(TAG, "Cannot Parse - " + e.getMessage());
-			throw new RuntimeException(e);
-		}
-		if (app.localLOGV)
-			Log.i(TAG, "Parsing Data..Done");
-	}
 	//
 	/**
 	 * This class is a collection of all gnc data objects.
@@ -427,7 +333,7 @@ public class GNCDataHandler {
 		 */
 		private void updateFullNames() {
 			// get iterator
-			Iterator accountIterator = accounts.values().iterator();
+			Iterator<Account> accountIterator = accounts.values().iterator();
 			Account account;
 			while (accountIterator.hasNext()) {
 				account = (Account) accountIterator.next();
@@ -469,7 +375,7 @@ public class GNCDataHandler {
 			// get key set
 			Set<String> keySet = accounts.keySet();
 			// get iterator
-			Iterator it = keySet.iterator();
+			Iterator<String> it = keySet.iterator();
 			while (it.hasNext()) {
 				Account child = accounts.get((String) it.next());
 				if (child.parentGUID != null) {
@@ -537,161 +443,6 @@ public class GNCDataHandler {
 	public class AccountComparator implements Comparator<Account> {
 		public int compare(Account o1, Account o2) {
 			return o1.fullName.compareTo(o2.fullName);
-		}
-	}
-	/**
-	 * This class is the XML data handler which implements the start and end
-	 * element methods to capture xml data and create data objects in data
-	 * collection object.
-	 * 
-	 * @author avvari.shyam
-	 * 
-	 */
-	private class XMLHandler extends DefaultHandler {
-		// Local data while collecting data
-		private Book			cBook;
-		private Account			cAccount;
-		private Commodity		cCommodity;
-		// data utilities
-		DateFormat				dfm			= new SimpleDateFormat(
-													"yyyy-MM-dd HH:mm:ss");
-		// String to collect data
-		protected StringBuffer	buffer		= new StringBuffer();
-		// current object values
-		private String			cCountType;
-		private boolean			isTemplate	= false;
-		/*
-		 * At the beginning of the document create a new data collection object.
-		 * 
-		 * @see org.xml.sax.helpers.DefaultHandler#startDocument()
-		 */
-		@Override
-		public void startDocument() throws SAXException {
-			// create new collection
-			gncData = new DataCollection();
-			// call super
-			super.startDocument();
-		}
-		/*
-		 * Start of element - find out the element and capture data
-		 * 
-		 * @see
-		 * org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
-		 * java.lang.String, java.lang.String, org.xml.sax.Attributes)
-		 */
-		@Override
-		public void startElement(String uri, String localName, String qName,
-				Attributes attributes) throws SAXException {
-			// Temp field
-			String value;
-			// Always clear buffer when a new element is started
-			buffer.setLength(0);
-			// Dispatch the type of main element
-			// gnc:book
-			if (qName.equalsIgnoreCase("gnc:book")) {
-				cBook = new Book();
-				cBook.version = attributes.getValue("version");
-			} else if (qName.equalsIgnoreCase("gnc:count-data")) {
-				cCountType = attributes.getValue("cd:type");
-			} else if (qName.equalsIgnoreCase("gnc:commodity")
-					|| qName.equalsIgnoreCase("act:commodity")) {
-				cCommodity = new Commodity();
-			} else if (qName.equalsIgnoreCase("gnc:account")) {
-				cAccount = new Account();
-			} else if (qName.equalsIgnoreCase("gnc:template-transactions")) {
-				isTemplate = true;
-			}
-		}
-		/*
-		 * End of element - add gathered data to data pool
-		 * 
-		 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
-		 * java.lang.String, java.lang.String)
-		 */
-		@Override
-		public void endElement(String uri, String localName, String qName)
-				throws SAXException {
-			// Trim the sides of the value
-			String value = buffer.toString().trim();
-			if (qName.equalsIgnoreCase("gnc:book") && cBook != null) {
-				gncData.book = cBook;
-			} else if (qName.equalsIgnoreCase("book:id")) {
-				cBook.GUID = value;
-			} else if (qName.equalsIgnoreCase("gnc:count-data")) {
-				if (cCountType.equalsIgnoreCase("account"))
-					cBook.cntAccount = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("transaction"))
-					cBook.cntTransaction = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("schedxaction"))
-					cBook.cntSchedxaction = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncJob"))
-					cBook.cntJob = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncInvoice"))
-					cBook.cntInvoice = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncCustomer"))
-					cBook.cntCustomer = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncBillTerm"))
-					cBook.cntBillTerm = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncTaxTable"))
-					cBook.cntTaxTable = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncEmployee"))
-					cBook.cntEmployee = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncEntry"))
-					cBook.cntEntry = Integer.valueOf(value);
-				else if (cCountType.equalsIgnoreCase("gnc:GncVendor"))
-					cBook.cntVendor = Integer.valueOf(value);
-			} else if (qName.equalsIgnoreCase("cmdty:space")) {
-				cCommodity.space = value;
-			} else if (qName.equalsIgnoreCase("cmdty:id")) {
-				cCommodity.id = value;
-			} else if (qName.equalsIgnoreCase("cmdty:quote_source")) {
-				cCommodity.quoteSource = value;
-			} else if (qName.equalsIgnoreCase("gnc:commodity")) {
-				gncData.commodities.put(cCommodity.quoteSource, cCommodity);
-			} else if (qName.equalsIgnoreCase("act:name")) {
-				cAccount.name = value;
-			} else if (qName.equalsIgnoreCase("act:id")) {
-				cAccount.GUID = value;
-			} else if (qName.equalsIgnoreCase("act:type")) {
-				cAccount.type = value;
-			} else if (qName.equalsIgnoreCase("act:parent")) {
-				cAccount.parentGUID = value;
-			} else if (qName.equalsIgnoreCase("act:description")) {
-				cAccount.description = value;
-			} else if (qName.equalsIgnoreCase("act:code")) {
-				cAccount.code = value;
-			} else if (qName.equalsIgnoreCase("gnc:account")
-					&& cAccount != null && !isTemplate) {
-				gncData.accounts.put(cAccount.GUID, cAccount);
-				if (cAccount.type.equalsIgnoreCase("root")) {
-					cBook.rootAccountGUID = cAccount.GUID;
-					Log.i(TAG, "Root guid is " + cAccount.GUID);
-				}
-			} else if (qName.equalsIgnoreCase("gnc:template-transactions")) {
-				isTemplate = false;
-			}
-		}
-		/*
-		 * At the end of document complete data collection
-		 * 
-		 * @see org.xml.sax.helpers.DefaultHandler#endDocument()
-		 */
-		@Override
-		public void endDocument() throws SAXException {
-			// Complete data collection
-			gncData.completeCollection();
-			// call super
-			super.endDocument();
-		}
-		/*
-		 * Accumulate characters read
-		 * 
-		 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
-		 */
-		@Override
-		public void characters(char[] ch, int start, int length)
-				throws SAXException {
-			buffer.append(ch, start, length);
 		}
 	}
 }
