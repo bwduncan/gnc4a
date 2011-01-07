@@ -34,7 +34,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -245,8 +244,6 @@ public class GNCDataHandler {
 					date + "\n" +
 					amount + "\n");
 			
-	        final Calendar c = Calendar.getInstance();
-	        
 	        Date now = new Date();
 	        DateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
 	        String postDate = formatter.format(now);
@@ -265,7 +262,7 @@ public class GNCDataHandler {
 	        String transQuery = "insert into transactions(guid,currency_guid,num,post_date,enter_date,description)" +
 	        " values('"+tx_guid+"','d42c51800f472526f265de2711a36020','"+postDate+"','','"+enterDate+"','"+description+"')";
 			Log.v(TAG, transQuery);
-			sqliteHandle.rawQuery(transQuery,null);
+			sqliteHandle.execSQL(transQuery);
 			
 			double d = Double.parseDouble(amount);
 			int demom = 100;
@@ -274,12 +271,12 @@ public class GNCDataHandler {
 			String toQuery = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
 			" values('"+GenGUID()+"','"+tx_guid+"','"+toGUID+"','','','n',"+value+",100,"+value+",100)";
 			Log.v(TAG, toQuery);
-			sqliteHandle.rawQuery(toQuery,null );
+			sqliteHandle.execSQL(toQuery);
 
 			String fromQuery = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
 			" values('"+GenGUID()+"','"+tx_guid+"','"+fromGUID+"','','','n',"+ -value +",100,"+ -value +",100)";
 			Log.v(TAG, fromQuery);
-			sqliteHandle.rawQuery(fromQuery,null);
+			sqliteHandle.execSQL(fromQuery);
 
 			sqliteHandle.setTransactionSuccessful();
 			
