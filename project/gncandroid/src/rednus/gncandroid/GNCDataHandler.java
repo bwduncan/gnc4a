@@ -62,7 +62,7 @@ public class GNCDataHandler {
 		*/
 		try
 		{
-			sqliteHandle = SQLiteDatabase.openDatabase(dataFile,null,SQLiteDatabase.OPEN_READWRITE);
+			sqliteHandle = SQLiteDatabase.openDatabase(dataFile,null,SQLiteDatabase.OPEN_READWRITE|SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			gncData = new DataCollection();
 			Cursor cursor = sqliteHandle.rawQuery("select * from books",null);
 	        if(cursor.getCount() >0)
