@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -36,6 +38,10 @@ public class GNCDataHandler {
 	private GNCAndroid			app;					// Application
 	private DataCollection		gncData;				// Data Collection
 	private SQLiteDatabase	    sqliteHandle;
+	private boolean				longAccountNames;
+	private String 				accountFilter;
+	private TreeMap<String,String> accountPrefMapping;
+	private Resources 			res;
 	
 	private final String transInsert = "insert into transactions(guid,currency_guid,num,post_date,enter_date,description) values(?,?,?,?,?,?)";	        		
 	private final String splitsInsert = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
@@ -53,15 +59,21 @@ public class GNCDataHandler {
 	 * @param compressed
 	 *            Boolean to specify if the data file is compressed or not
 	 */
-	public GNCDataHandler(GNCAndroid app, String dataFile, boolean compressed) {
+	public GNCDataHandler(GNCAndroid app, String dataFile, boolean longAccountNames) {
 		this.app = app;
+		
+		res = app.getResources();
+
 		// get file reader
 		/*
 		InputStream inStream = getInputStream(dataFile, compressed);
 		this.readFile(inStream);
 		*/
+		this.longAccountNames = longAccountNames;
 		try
 		{
+			BuildAccountMapping();
+			
 			sqliteHandle = SQLiteDatabase.openDatabase(dataFile,null,SQLiteDatabase.OPEN_READWRITE|SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			gncData = new DataCollection();
 			Cursor cursor = sqliteHandle.rawQuery("select * from books",null);
@@ -105,7 +117,34 @@ public class GNCDataHandler {
 		{
 			Log.e(TAG, e.getStackTrace().toString());
 		}
-
+	}
+	
+	public void BuildAccountMapping() {
+		// TODO This isn't the full list
+		accountPrefMapping = new TreeMap<String,String>();
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_asset),"ASSET");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_bank),"BANK");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_cc),"CREDIT");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_expense),"EXPENSE");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_equity),"EQUITY");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_income),"INCOME");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_liability),"LIABILITY");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_mutual_fund),"MUTUAL");
+		accountPrefMapping.put(res.getString(R.string.pref_account_type_stock),"STOCK");
+	}
+	
+	public void GenAccountFilter(SharedPreferences sp) {
+		StringBuffer filter = new StringBuffer();
+		if ( !sp.getBoolean(res.getString(R.string.pref_show_hidden_account),false) )
+			filter.append(" and hidden=0 ");
+		
+		Iterator<String> iter = accountPrefMapping.keySet().iterator();
+		while (iter.hasNext()) {
+			String key = iter.next();
+			if ( !sp.getBoolean(key,true) )
+				filter.append(" and account_type!='"+ accountPrefMapping.get(key) +"' ");
+		}
+		accountFilter = filter.toString();
 	}
 	
 	public Account GetAccount(String GUID, boolean getBalance) {
@@ -139,7 +178,7 @@ public class GNCDataHandler {
 		return retVal;
 	}
 	
-	public TreeMap<String,String> GetAccountList(boolean expense, boolean longNames) {
+	public TreeMap<String,String> GetAccountList(boolean expense) {
 		String query;
 		String types;
 		if ( expense )
@@ -157,10 +196,17 @@ public class GNCDataHandler {
             {
             	Account account = this.AccountFromCursor(cursor,false);
             	
-            	if ( longNames )
+            	if ( longAccountNames )
             		listData.put(account.fullName, account.GUID);
             	else
-            		listData.put(account.name, account.GUID);
+            	{
+            		String guid = listData.get(account.name);
+            		if ( guid == null )
+            			listData.put(account.name, account.GUID);
+            		else { // We have a name collision
+            			listData.put(account.fullName, account.GUID);
+            		}
+            	}
 
             }
             cursor.close();	
@@ -173,7 +219,7 @@ public class GNCDataHandler {
 	}
 	
 	public TreeMap<String, Account> GetSubAccounts(String rootGUID) {
-		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+rootGUID+"' and hidden=0 and account_type!='EQUITY' and account_type!='EXPENSE' and account_type!='INCOME' order by name",null);
+		Cursor cursor = sqliteHandle.rawQuery("select * from accounts where parent_guid='"+rootGUID+"' "+ accountFilter +" order by name",null);
         if(cursor.getCount() >0)
         {
         	TreeMap<String, Account> listData = new TreeMap<String, Account>();
@@ -358,7 +404,7 @@ public class GNCDataHandler {
 			fullName = account.name;
 			while (null != p) {
 				Account parent = (Account) gncData.accounts.get(p);
-				if (parent == null || parent.name.equalsIgnoreCase("ROOT")) {
+				if (parent == null || parent.name.contains("Root")) {
 					break;
 				}
 				fullName = parent.name + ":" + fullName;

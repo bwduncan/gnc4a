@@ -17,9 +17,11 @@
 	<string name="no_data_file">No Data File.</string>
 	<string name="message_set_data_file">Set data file location.</string>
 	<string name="button_text_ok">Ok</string>
-	<string name="data_file_compressed">Data file Compressed?</string>
+	<string name="long_account_names">Use long account Names?</string>
+	<string name="pref_long_account_names">Use Long Account Names</string>
 	<string name="menu_file_pref">Data File Details</string>
 	<string name="menu_save">Save</string>
+	<string name="menu_filter">Filter</string>
 	<string name="menu_discard">Discard</string>
 	<string name="menu_app_pref">Application Details</string>
 	<string name="pref_app_version">Version</string>

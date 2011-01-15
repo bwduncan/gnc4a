@@ -124,14 +124,14 @@ public class QuickEntryActivity
 	}
 
 	private void constructAccountLists() {
-		TreeMap<String,String> toAccounts = app.gncDataHandler.GetAccountList(true, false);
+		TreeMap<String,String> toAccounts = app.gncDataHandler.GetAccountList(true);
 		toAccountNames = new String[toAccounts.size()];
 		toAccountGUIDs = new String[toAccounts.size()];
 		toAccounts.keySet().toArray(toAccountNames);
 		for (int i=0;i<toAccounts.size();i++)
 			toAccountGUIDs[i] = toAccounts.get(toAccountNames[i]);
 
-		TreeMap<String,String> fromAccounts = app.gncDataHandler.GetAccountList(false, false);
+		TreeMap<String,String> fromAccounts = app.gncDataHandler.GetAccountList(false);
 		fromAccountNames = new String[fromAccounts.size()];
 		fromAccountGUIDs = new String[fromAccounts.size()];
 		fromAccounts.keySet().toArray(fromAccountNames);

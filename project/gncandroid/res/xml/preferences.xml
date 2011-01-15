@@ -10,12 +10,12 @@
 			<intent
 				android:action="rednus.GNCAndroid.action.FILECHOOSER" />
 		</Preference>
-		<CheckBoxPreference
-			android:key="@string/pref_data_file_gzip"
-			android:title="@string/data_file_compressed" />
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/menu_app_pref">
+		<CheckBoxPreference
+			android:key="@string/pref_long_account_names"
+			android:title="@string/long_account_names" />
 		<Preference
 			android:key="@string/pref_version_key"
 			android:title="@string/pref_app_version"

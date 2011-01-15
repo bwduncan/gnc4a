@@ -30,7 +30,7 @@ public class GNCAndroid extends Application implements
 	public Resources			res;
 	public GNCDataHandler		gncDataHandler;
 	private String				dataFile	= null;
-	private boolean				gzipFile	= false;
+	private boolean				longAccountNames	= false;
 	private boolean				reloadFile	= true;
 	/**
 	 * This method checks preferences and confirms if all information is
@@ -78,7 +78,6 @@ public class GNCAndroid extends Application implements
 	 *      onSharedPreferenceChanged(android.content.SharedPreferences,
 	 *      java.lang.String)
 	 */
-	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
 		if (localLOGV) {
 			Log.i(TAG, "Pref " + key + "changed... reading new value...");
@@ -92,13 +91,14 @@ public class GNCAndroid extends Application implements
 			}
 			// change value
 			setDataFileChanged(newPath);
-		} else if (key.equals(res.getString(R.string.pref_data_file_gzip))) {
+		} else if (key.equals(res.getString(R.string.pref_long_account_names))) {
 			// get new value
-			gzipFile = sp.getBoolean(
-					res.getString(R.string.pref_data_file_gzip), false);
+			longAccountNames = sp.getBoolean(
+					res.getString(R.string.pref_long_account_names), false);
 			if (localLOGV) {
-				Log.i(TAG, "New value " + String.valueOf(gzipFile));
+				Log.i(TAG, "New value " + String.valueOf(longAccountNames));
 			}
+			gncDataHandler.GenAccountFilter(sp);
 			// Set to reload file
 			reloadFile = true;
 		} 
@@ -112,7 +112,8 @@ public class GNCAndroid extends Application implements
 		if (localLOGV) {
 			Log.i(TAG, "Reading Data...");
 		}
-		gncDataHandler = new GNCDataHandler(this, dataFile, gzipFile);
+		gncDataHandler = new GNCDataHandler(this, dataFile, longAccountNames);
+		gncDataHandler.GenAccountFilter(getSharedPreferences(SPN, MODE_PRIVATE));
 		reloadFile = false;
 		return true;
 	}
@@ -131,8 +132,8 @@ public class GNCAndroid extends Application implements
 		}
 		if (dataFile == null)
 			return;
-		// read if data file is compressed
-		gzipFile = sp.getBoolean(res.getString(R.string.pref_data_file_gzip),
+		// read if we want long account names
+		longAccountNames = sp.getBoolean(res.getString(R.string.pref_long_account_names),
 				false);
 	}
 	/**
