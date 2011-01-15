@@ -32,4 +32,63 @@
 				android:data="http://www.android.com" />
 		</Preference>
 	</PreferenceCategory>
+<PreferenceScreen
+		 android:key="@string/filterprefscreen"
+         android:title="@string/acountfilter">
+	<PreferenceCategory
+			android:title="@string/filterbyaccounttype">
+
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_bank"
+			android:title="@string/account_type_bank" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_cash"
+			android:title="@string/account_type_cash" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_asset"
+			android:title="@string/account_type_asset" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_cc"
+			android:title="@string/account_type_cc" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_liability"
+			android:title="@string/account_type_liability" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_stock"
+			android:title="@string/account_type_stock" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_mutual_fund"
+			android:title="@string/account_type_mutual_fund" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_currency"
+			android:title="@string/account_type_currency" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_income"
+			android:title="@string/account_type_income" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_expense"
+			android:title="@string/account_type_expense" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_equity"
+			android:title="@string/account_type_equity" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_a_receivable"
+			android:title="@string/account_type_a_receivable" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_a_payable"
+			android:title="@string/account_type_a_payable" />
+		<CheckBoxPreference
+			android:key="@string/pref_account_type_trading"
+			android:title="@string/account_type_trading" />
+	</PreferenceCategory>
+	<PreferenceCategory
+			android:title="@string/other">
+		<CheckBoxPreference
+			android:key="@string/pref_show_hidden_account"
+			android:title="@string/show_hidden_account" />
+		<CheckBoxPreference
+			android:key="@string/pref_show_zero_total_accounts"
+			android:title="@string/show_zero_total_accounts" />
+	</PreferenceCategory>
+</PreferenceScreen>
 </PreferenceScreen>

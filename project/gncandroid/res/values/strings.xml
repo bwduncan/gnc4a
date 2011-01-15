@@ -71,4 +71,45 @@
 <string name="entries">Entries</string>
 <string name="taxtables">Tax Tables</string>
 <string name="billterms">Bill Terms</string>
+
+
+<string name="filterprefscreen">FilterPrefScreen</string>
+<string name="acountfilter">Account Filter</string>
+<string name="filterbyaccounttype">Filter By Account Type</string>
+<string name="other">Other</string>
+<string name="pref_show_hidden_account">show_hidden_account</string>
+<string name="show_hidden_account">Show Hidden Accounts</string>
+<string name="pref_show_zero_total_accounts">show_zero_total_accounts</string>
+<string name="show_zero_total_accounts">Show Zero Total Accounts</string>
+
+<string name="pref_account_type_bank">account_type_bank</string>
+<string name="account_type_bank">Bank</string>
+<string name="pref_account_type_cash">account_type_cash</string>
+<string name="account_type_cash">Cash</string>
+<string name="pref_account_type_asset">account_type_asset</string>
+<string name="account_type_asset">Asset</string>
+<string name="pref_account_type_cc">account_type_cc</string>
+<string name="account_type_cc">Credit Card</string>
+<string name="pref_account_type_liability">account_type_liability</string>
+<string name="account_type_liability">Liability</string>
+<string name="pref_account_type_stock">account_type_stock</string>
+<string name="account_type_stock">Stock</string>
+<string name="pref_account_type_mutual_fund">account_type_mutual_fund</string>
+<string name="account_type_mutual_fund">Mutual Fund</string>
+<string name="pref_account_type_currency">account_type_currency</string>
+<string name="account_type_currency">Currency</string>
+<string name="pref_account_type_income">account_type_income</string>
+<string name="account_type_income">Income</string>
+<string name="pref_account_type_expense">account_type_expense</string>
+<string name="account_type_expense">Expense</string>
+<string name="pref_account_type_equity">account_type_equity</string>
+<string name="account_type_equity">Equity</string>
+<string name="pref_account_type_a_receivable">account_type_a_receivable</string>
+<string name="account_type_a_receivable">A/Receivable</string>
+<string name="pref_account_type_a_payable">account_type_a_payable</string>
+<string name="account_type_a_payable">A/Payable</string>
+<string name="pref_account_type_trading">account_type_trading</string>
+<string name="account_type_trading">Trading</string>
+
+
 </resources>
