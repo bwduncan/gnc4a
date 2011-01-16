@@ -24,55 +24,55 @@
 	
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_bank"
-				android:title="@string/account_type_bank" />
+				android:title="@string/account_type_bank" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_cash"
-				android:title="@string/account_type_cash" />
+				android:title="@string/account_type_cash" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_asset"
-				android:title="@string/account_type_asset" />
+				android:title="@string/account_type_asset" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_cc"
-				android:title="@string/account_type_cc" />
+				android:title="@string/account_type_cc" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_liability"
-				android:title="@string/account_type_liability" />
+				android:title="@string/account_type_liability" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_stock"
-				android:title="@string/account_type_stock" />
+				android:title="@string/account_type_stock" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_mutual_fund"
-				android:title="@string/account_type_mutual_fund" />
+				android:title="@string/account_type_mutual_fund" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_currency"
-				android:title="@string/account_type_currency" />
+				android:title="@string/account_type_currency" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_income"
-				android:title="@string/account_type_income" />
+				android:title="@string/account_type_income" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_expense"
-				android:title="@string/account_type_expense" />
+				android:title="@string/account_type_expense" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_equity"
-				android:title="@string/account_type_equity" />
+				android:title="@string/account_type_equity" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_a_receivable"
-				android:title="@string/account_type_a_receivable" />
+				android:title="@string/account_type_a_receivable" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_a_payable"
-				android:title="@string/account_type_a_payable" />
+				android:title="@string/account_type_a_payable" android:defaultValue="true"/>
 			<CheckBoxPreference
 				android:key="@string/pref_account_type_trading"
-				android:title="@string/account_type_trading" />
+				android:title="@string/account_type_trading" android:defaultValue="true"/>
 		</PreferenceCategory>
 		<PreferenceCategory
 				android:title="@string/other">
 			<CheckBoxPreference
 				android:key="@string/pref_show_hidden_account"
-				android:title="@string/show_hidden_account" />
+				android:title="@string/show_hidden_account" android:defaultValue="false"/>
 			<CheckBoxPreference
 				android:key="@string/pref_show_zero_total_accounts"
-				android:title="@string/show_zero_total_accounts" />
+				android:title="@string/show_zero_total_accounts" android:defaultValue="false"/>
 		</PreferenceCategory>
 	</PreferenceScreen>
 	</PreferenceCategory>
