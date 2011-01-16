@@ -49,9 +49,12 @@ public class MainView extends TabActivity {
 		else {
 			if (app.localLOGV)
 				Log.i(TAG, "No Data file set.. Forcing preferences...");
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(
-					app.res.getString(R.string.message_set_data_file))
+            forcePreferences(app.res.getString(R.string.message_set_data_file));
+        }
+    }
+    private void forcePreferences(String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
 					.setCancelable(false)
 					.setPositiveButton(
 							app.res.getString(R.string.button_text_ok),
@@ -67,8 +70,8 @@ public class MainView extends TabActivity {
 								}
 							});
 			builder.create().show();
-		}
 	}
+
 	/**
 	 * This method is called once read data activity is finished so that the sub
 	 * activities are initiated.
@@ -76,6 +79,12 @@ public class MainView extends TabActivity {
 	private void showScreen() {
 		if (app.localLOGV)
 			Log.i(TAG, "Showing main screen...");
+        if (!app.gncDataHandler.dataValid) {
+            if (app.localLOGV)
+                Log.i(TAG, "GNCDataHandler failed to initialise.. Forcing preferences...");
+            forcePreferences(app.res.getString(R.string.message_failed_to_read_data_file));
+            return;
+        }
 		// The activity TabHost
 		final TabHost tabHost = getTabHost();
 		// Reusable TabSpec for each tab

@@ -70,11 +70,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 	 */
 	private void getListData(String rootGUID) {
 		// get root account
-		TreeMap<String, Account> ld = app.gncDataHandler.GetSubAccounts(rootGUID);
-		//Account root = dc.accounts.get(rootGUID);
-		if (null == ld)
-			return;
-		listData = ld;
+        listData = app.gncDataHandler.GetSubAccounts(rootGUID);
 
 		currRootGUID = rootGUID;
 	}

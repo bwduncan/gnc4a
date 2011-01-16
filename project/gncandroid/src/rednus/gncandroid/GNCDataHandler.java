@@ -42,6 +42,7 @@ public class GNCDataHandler {
 	private String 				accountFilter;
 	private TreeMap<String,String> accountPrefMapping;
 	private Resources 			res;
+    public boolean dataValid = false;
 	
 	private final String transInsert = "insert into transactions(guid,currency_guid,num,post_date,enter_date,description) values(?,?,?,?,?,?)";	        		
 	private final String splitsInsert = "insert into splits(guid,tx_guid,account_guid,memo,action,reconcile_state,value_num,value_denom,quantity_num,quantity_denom)"+
@@ -64,11 +65,6 @@ public class GNCDataHandler {
 		
 		res = app.getResources();
 
-		// get file reader
-		/*
-		InputStream inStream = getInputStream(dataFile, compressed);
-		this.readFile(inStream);
-		*/
 		this.longAccountNames = longAccountNames;
 		try
 		{
@@ -110,11 +106,11 @@ public class GNCDataHandler {
 	        }
 	        cursor.close();
 
-	        
+
 	        gncData.completeCollection();
+			dataValid = true;
 		}
-		catch (Exception e )
-		{
+		catch (Exception e ) {
 			Log.e(TAG, e.getStackTrace().toString());
 		}
 	}
@@ -138,13 +134,11 @@ public class GNCDataHandler {
 		if ( !sp.getBoolean(res.getString(R.string.pref_show_hidden_account),false) )
 			filter.append(" and hidden=0 ");
 		
-		Iterator<String> iter = accountPrefMapping.keySet().iterator();
-		while (iter.hasNext()) {
-			String key = iter.next();
+        for (String key : accountPrefMapping.keySet())
 			if ( !sp.getBoolean(key,true) )
 				filter.append(" and account_type!='"+ accountPrefMapping.get(key) +"' ");
-		}
-		accountFilter = filter.toString();
+
+        accountFilter = filter.toString();
 	}
 	
 	public Account GetAccount(String GUID, boolean getBalance) {
@@ -378,13 +372,9 @@ public class GNCDataHandler {
 		 * attribute
 		 */
 		private void updateFullNames() {
-			// get iterator
-			Iterator<Account> accountIterator = accounts.values().iterator();
-			Account account;
-			while (accountIterator.hasNext()) {
-				account = (Account) accountIterator.next();
+            for (Account account : accounts.values())
 				account.fullName = getFullName(account);
-			}
+
 		}
 		/**
 		 * This method takes an account, finds its parents and grand parents
@@ -418,18 +408,14 @@ public class GNCDataHandler {
 		 * parent account's subList with its GUID.
 		 */
 		private void createAccountTree() {
-			// get key set
-			Set<String> keySet = accounts.keySet();
-			// get iterator
-			Iterator<String> it = keySet.iterator();
-			while (it.hasNext()) {
-				Account child = accounts.get((String) it.next());
-				if (child.parentGUID != null) {
+            for (String accountName : accounts.keySet()) {
+            	Account child = accounts.get(accountName); 
+            	if (child.parentGUID != null) {
 					Account parent = accounts.get(child.parentGUID);
 					parent.subList.add(child.GUID);
 					parent.hasChildren = true;
 				}
-			}
+            }
 		}
 	}
 	public class Book {
