@@ -24,9 +24,10 @@ import android.widget.TabHost;
  * 
  */
 public class MainView extends TabActivity {
-	private static final String	TAG	= "MainView";	// TAG for this activity
-	private GNCAndroid			app;				// Application Reference
-	private ProgressDialog		pd;				// progress bar
+	private static final String TAG = "MainView"; // TAG for this activity
+	private GNCAndroid app; // Application Reference
+	private ProgressDialog pd; // progress bar
+
 	/*
 	 * Start of activity. Check if data file can be read, if not show dialog and
 	 * navigate to preferences. Also add sub activities as tabs to self.
@@ -41,35 +42,32 @@ public class MainView extends TabActivity {
 		// first check if data file is set otherwise show preferences
 		// Read data if has
 		if (app.canReadData()) {
-			if ( app.isReloadFile() ) // The data may already be read
+			if (app.isReloadFile()) // The data may already be read
 				new ReadDataTask().execute();
 			else
 				showScreen();
-		}
-		else {
+		} else {
 			if (app.localLOGV)
 				Log.i(TAG, "No Data file set.. Forcing preferences...");
-            forcePreferences(app.res.getString(R.string.message_set_data_file));
-        }
-    }
-    private void forcePreferences(String message) {
+			forcePreferences(app.res.getString(R.string.message_set_data_file));
+		}
+	}
+
+	private void forcePreferences(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(message)
-					.setCancelable(false)
-					.setPositiveButton(
-							app.res.getString(R.string.button_text_ok),
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int id) {
-									// show prefs
-									Intent i = new Intent(getBaseContext(),
-											Preferences.class);
-									startActivity(i);
-									return;
-								}
-							});
-			builder.create().show();
+		builder.setMessage(message).setCancelable(false).setPositiveButton(
+				app.res.getString(R.string.button_text_ok),
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						// show prefs
+						Intent i = new Intent(getBaseContext(),
+								Preferences.class);
+						startActivity(i);
+						return;
+					}
+				});
+		builder.create().show();
 	}
 
 	/**
@@ -79,12 +77,15 @@ public class MainView extends TabActivity {
 	private void showScreen() {
 		if (app.localLOGV)
 			Log.i(TAG, "Showing main screen...");
-        if (!app.gncDataHandler.dataValid) {
-            if (app.localLOGV)
-                Log.i(TAG, "GNCDataHandler failed to initialise.. Forcing preferences...");
-            forcePreferences(app.res.getString(R.string.message_failed_to_read_data_file));
-            return;
-        }
+		if (!app.gncDataHandler.dataValid) {
+			if (app.localLOGV)
+				Log
+						.i(TAG,
+								"GNCDataHandler failed to initialise.. Forcing preferences...");
+			forcePreferences(app.res
+					.getString(R.string.message_failed_to_read_data_file));
+			return;
+		}
 		// The activity TabHost
 		final TabHost tabHost = getTabHost();
 		// Reusable TabSpec for each tab
@@ -93,19 +94,17 @@ public class MainView extends TabActivity {
 		Intent intent;
 		// add accounts tab
 		intent = new Intent().setClass(this, AccountsActivity.class);
-		spec = tabHost
-				.newTabSpec("accounts")
-				.setIndicator(getString(R.string.ic_tab_accounts),
-						app.res.getDrawable(R.drawable.ic_tab_accounts))
-				.setContent(intent);
+		spec = tabHost.newTabSpec("accounts").setIndicator(
+				getString(R.string.ic_tab_accounts),
+				app.res.getDrawable(R.drawable.ic_tab_accounts)).setContent(
+				intent);
 		tabHost.addTab(spec);
 		// add quick tab
 		intent = new Intent().setClass(this, QuickEntryActivity.class);
-		spec = tabHost
-				.newTabSpec("quick")
-				.setIndicator(getString(R.string.ic_tab_quick),
-						app.res.getDrawable(R.drawable.ic_tab_actions))
-				.setContent(intent);
+		spec = tabHost.newTabSpec("quick").setIndicator(
+				getString(R.string.ic_tab_quick),
+				app.res.getDrawable(R.drawable.ic_tab_actions)).setContent(
+				intent);
 		tabHost.addTab(spec);
 		// #TODO add third tab
 		// // // add actions tab
@@ -121,6 +120,7 @@ public class MainView extends TabActivity {
 		if (app.localLOGV)
 			Log.i(TAG, "Showing main screen...Done");
 	}
+
 	/*
 	 * When menu is selected on this app, show options.
 	 * 
@@ -132,6 +132,7 @@ public class MainView extends TabActivity {
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
+
 	/*
 	 * When any menu item is selected, perform specific action
 	 * 
@@ -146,8 +147,9 @@ public class MainView extends TabActivity {
 			startActivity(new Intent(getBaseContext(), Preferences.class));
 			return true;
 		case R.id.menu_book:
-			//Start intent to show book details
-			startActivity(new Intent(getBaseContext(), BookDetailsActivity.class));
+			// Start intent to show book details
+			startActivity(new Intent(getBaseContext(),
+					BookDetailsActivity.class));
 			return true;
 		case R.id.menu_save:
 			// Save data
@@ -161,6 +163,7 @@ public class MainView extends TabActivity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
 	/*
 	 * When the view is restarted when returned from preferences screen, check
 	 * if the reload file flag is set and read data again if it does
@@ -178,6 +181,7 @@ public class MainView extends TabActivity {
 			// read data
 			new ReadDataTask().execute();
 	}
+
 	/**
 	 * This class implements AsynTask and reads the data file in a new thread so
 	 * that the Time Out trigger does not happen.
@@ -200,6 +204,7 @@ public class MainView extends TabActivity {
 			else
 				pd.show();
 		}
+
 		/*
 		 * Call method readData of GNCAndroid in background task
 		 * 
@@ -209,6 +214,7 @@ public class MainView extends TabActivity {
 		protected Boolean doInBackground(Void... voids) {
 			return app.readData();
 		}
+
 		/*
 		 * Close progress dialog after execution
 		 * 
@@ -218,9 +224,9 @@ public class MainView extends TabActivity {
 		protected void onPostExecute(Boolean result) {
 			// Refresh View here
 			pd.dismiss();
-			
+
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-			
+
 			showScreen();
 		}
 	}

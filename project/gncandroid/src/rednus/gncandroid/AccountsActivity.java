@@ -30,12 +30,13 @@ import android.widget.TextView;
  */
 public class AccountsActivity extends Activity implements OnItemClickListener {
 	// TAG for this activity
-	private static final String		TAG			= "AccountsActivity";
+	private static final String TAG = "AccountsActivity";
 	// Application data
-	private GNCAndroid				app;
-	private String					currRootGUID;
-	private Map<String, Account>	listData	= new TreeMap<String, Account>();
-	private DataCollection			dc;
+	private GNCAndroid app;
+	private String currRootGUID;
+	private Map<String, Account> listData = new TreeMap<String, Account>();
+	private DataCollection dc;
+
 	/*
 	 * When activity is started, and if Data file is already read, then display
 	 * account information tree.
@@ -62,6 +63,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		if (app.localLOGV)
 			Log.i(TAG, "Activity Finished");
 	}
+
 	/**
 	 * This method will get all the sub accounts of root and adds it to the list
 	 * for display.
@@ -70,10 +72,11 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 	 */
 	private void getListData(String rootGUID) {
 		// get root account
-        listData = app.gncDataHandler.GetSubAccounts(rootGUID);
+		listData = app.gncDataHandler.GetSubAccounts(rootGUID);
 
 		currRootGUID = rootGUID;
 	}
+
 	/*
 	 * Event Handler for List item selection
 	 * 
@@ -101,6 +104,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		if (app.localLOGV)
 			Log.i(TAG, "Accounts Refreshed");
 	}
+
 	/**
 	 * This class implements Adapter methods for displaying accounts in a list
 	 * view
@@ -109,7 +113,8 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 	 * 
 	 */
 	private class AccountsListAdapter extends BaseAdapter {
-		private LayoutInflater	mInflater;
+		private LayoutInflater mInflater;
+
 		/**
 		 * Constructor - creates inflator's instance from context
 		 * 
@@ -118,6 +123,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		public AccountsListAdapter(Context context) {
 			mInflater = LayoutInflater.from(context);
 		}
+
 		/*
 		 * Returns the total number of items to be displayed
 		 * 
@@ -126,6 +132,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		public int getCount() {
 			return listData.size();
 		}
+
 		/*
 		 * Returns the Item in specific position
 		 * 
@@ -134,6 +141,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		public Object getItem(int i) {
 			return listData.get(listData.keySet().toArray()[i]);
 		}
+
 		/*
 		 * Returns the id of the item in specific position. In this case its the
 		 * position itself.
@@ -143,6 +151,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		public long getItemId(int i) {
 			return i;
 		}
+
 		/*
 		 * This method creates the list item for specific position passed. It
 		 * populates data from the list item at position.
@@ -183,6 +192,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 			// return
 			return convertView;
 		}
+
 		/*
 		 * When the data in list listData changed, it is necessary to redraw the
 		 * list view and fill it up with new data.
@@ -195,6 +205,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 			super.notifyDataSetInvalidated();
 			super.notifyDataSetChanged();
 		}
+
 		/*
 		 * This methods tells the view layout that all the items in the list are
 		 * not enabled by default.
@@ -205,6 +216,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		public boolean areAllItemsEnabled() {
 			return false;
 		}
+
 		/*
 		 * This method checks if the list item has children and then return true
 		 * to enable the list item as clickable.
@@ -216,6 +228,7 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 			Account account = (Account) getItem(position);
 			return account.hasChildren;
 		}
+
 		/**
 		 * This is holder class for Account Summary Row
 		 * 
@@ -223,9 +236,9 @@ public class AccountsActivity extends Activity implements OnItemClickListener {
 		 * 
 		 */
 		private class AccountItem {
-			ImageView	btnExpand;
-			TextView	txvAccName;
-			TextView	txvBalance;
+			ImageView btnExpand;
+			TextView txvAccName;
+			TextView txvBalance;
 		}
 	}
 }

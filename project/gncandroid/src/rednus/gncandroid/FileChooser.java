@@ -27,12 +27,13 @@ import android.widget.TextView;
  * 
  */
 public class FileChooser extends ListActivity {
-	private final String		TAG				= "File Chooser";
-	protected ArrayList<String>	mFileList;
-	protected File				mRoot;
-	public static final String	FILEPATH_KEY	= "formpath";
-	private String				pref_name;
-	private GNCAndroid			app;
+	private final String TAG = "File Chooser";
+	protected ArrayList<String> mFileList;
+	protected File mRoot;
+	public static final String FILEPATH_KEY = "formpath";
+	private String pref_name;
+	private GNCAndroid app;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class FileChooser extends ListActivity {
 		// File(app.res.getString(R.string.pref_data_file_key)).getParentFile().getAbsolutePath());
 		// }
 	}
+
 	private void initialize(String path) {
 		mFileList = new ArrayList<String>();
 		// mFileList.add("..");
@@ -64,6 +66,7 @@ public class FileChooser extends ListActivity {
 			displayFiles();
 		}
 	}
+
 	private void refreshRoot(File f) {
 		mRoot = f;
 		mFileList.clear();
@@ -73,6 +76,7 @@ public class FileChooser extends ListActivity {
 		Collections.sort(mFileList, String.CASE_INSENSITIVE_ORDER);
 		((ArrayAdapter) this.getListAdapter()).notifyDataSetChanged();
 	}
+
 	private boolean getDirectory(String path) {
 		TextView tv = (TextView) findViewById(R.id.filelister_message);
 		// check to see if there's an sd card.
@@ -92,6 +96,7 @@ public class FileChooser extends ListActivity {
 			return true;
 		return false;
 	}
+
 	private void getFiles(File f) {
 		if (f.isDirectory()) {
 			File[] childs = f.listFiles();
@@ -103,10 +108,12 @@ public class FileChooser extends ListActivity {
 		} else
 			getFile(f);
 	}
+
 	private void getFile(File f) {
 		String filename = f.getName();
 		mFileList.add(filename);
 	}
+
 	/**
 	 * Opens the directory, puts valid files in array adapter for display
 	 */
@@ -116,6 +123,7 @@ public class FileChooser extends ListActivity {
 				android.R.layout.simple_list_item_1, mFileList);
 		setListAdapter(fileAdapter);
 	}
+
 	/**
 	 * Stores the path of clicked file in the intent and exits.
 	 */
@@ -139,8 +147,8 @@ public class FileChooser extends ListActivity {
 			Log.i(TAG, "File selected, returning result");
 		// send result
 		Intent i = new Intent();
-		i.putExtra(app.res.getString(R.string.pref_data_file_key),
-				f.getAbsolutePath());
+		i.putExtra(app.res.getString(R.string.pref_data_file_key), f
+				.getAbsolutePath());
 		setResult(RESULT_OK, i);
 		// close activity
 		finish();
