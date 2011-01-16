@@ -1,0 +1,36 @@
+Hacking on gnc4a
+================
+
+Building the code
+-----------------
+
+Start by getting the android SDK. Follow the instructions at:
+
+http://developer.android.com/sdk/installing.html
+
+You will also need Apache Ant. It's in Debian/Ubuntu as "ant" and available at:
+
+http://ant.apache.org/
+
+Once you have installed the dependencies, start an Android Virtual Device (AVD)
+and run this:
+
+cd <path to source>/project/gncandroid
+android update project --target <AVD target> --path .
+ant install
+
+That's it!
+
+Contributing to gnc4a
+---------------------
+
+Follow the Java coding conventions at:
+
+http://java.sun.com/docs/codeconv/
+
+unless doing so would break the existing convention in a source file. Try to
+be consistent where possible.
+
+Email unified diff patches to the authors listed at:
+
+http://code.google.com/p/gnc4a/
