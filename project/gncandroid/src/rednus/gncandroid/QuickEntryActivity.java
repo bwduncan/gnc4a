@@ -127,16 +127,18 @@ public class QuickEntryActivity extends Activity {
 	}
 
 	private void constructAccountLists() {
+		String[] toAccountFilter = {"EXPENSE"};
 		TreeMap<String, String> toAccounts = app.gncDataHandler
-				.GetAccountList(true);
+				.GetAccountList(toAccountFilter);
 		toAccountNames = new String[toAccounts.size()];
 		toAccountGUIDs = new String[toAccounts.size()];
 		toAccounts.keySet().toArray(toAccountNames);
 		for (int i = 0; i < toAccounts.size(); i++)
 			toAccountGUIDs[i] = toAccounts.get(toAccountNames[i]);
 
+		String[] fromAccountFilter = {"CREDIT", "BANK"};
 		TreeMap<String, String> fromAccounts = app.gncDataHandler
-				.GetAccountList(false);
+				.GetAccountList(fromAccountFilter);
 		fromAccountNames = new String[fromAccounts.size()];
 		fromAccountGUIDs = new String[fromAccounts.size()];
 		fromAccounts.keySet().toArray(fromAccountNames);

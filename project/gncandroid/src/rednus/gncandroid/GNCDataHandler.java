@@ -196,14 +196,27 @@ public class GNCDataHandler {
 		return retVal;
 	}
 
-	public TreeMap<String, String> GetAccountList(boolean expense) {
+	public TreeMap<String, String> GetAccountList(String[] accountTypes) {
 		String query;
 		String types;
+		
+		/*
 		if (expense)
 			types = "'EXPENSE'";
 		else
 			types = "'CREDIT', 'BANK'";
-
+		*/
+		StringBuffer tb = new StringBuffer();
+		Boolean first = true;
+		for (String at: accountTypes) {
+			if ( !first )
+				tb.append(", ");
+			tb.append("'"+at+"'");
+			first = false;
+		}
+		types = tb.toString();
+		
+		
 		query = "select guid, name from accounts where account_type in ("
 				+ types + ") and hidden=0 and non_std_scu=0 order by name";
 
