@@ -7,10 +7,8 @@
 package rednus.gncandroid;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import android.R.drawable;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +29,6 @@ public class FileChooser extends ListActivity {
 	protected ArrayList<String> mFileList;
 	protected File mRoot;
 	public static final String FILEPATH_KEY = "formpath";
-	private String pref_name;
 	private GNCAndroid app;
 
 	/** Called when the activity is first created. */
